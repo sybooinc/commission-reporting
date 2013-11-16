@@ -4,8 +4,25 @@ define(['moment'], function(moment){
 		, utils = syboo.utils || {};
 
 	utils.dateSelector = {};
+	utils.dateSelector.payPeriods = [];
 
 	utils.dateSelector.initialize = function(){
+		// set the last three pay periods
+		var currentDate = moment().date()
+			, payPeriods = utils.dateSelector.payPeriods;
+		if(currentDate < 15){
+			payPeriods.push( moment( {d: 0, M: moment().month() } ) );
+			payPeriods.push( moment( {d: 15, M: moment().month() - 1} ) );
+			payPeriods.push( moment( {d: 0, M: moment().month() - 1} ) );
+		}else{
+			payPeriods.push( moment( {d: 15, M: moment().month()} ) );
+			payPeriods.push( moment( {d: 0, M: moment().month() } ) );
+			payPeriods.push( moment( {d: 15, M: moment().month() - 1} ) );
+		}
+		$('.quickPickMenu div:nth-child(2)').html('Pay Period: ' + payPeriods[0].format('YYYY-MM-DD'));
+		$('.quickPickMenu div:nth-child(3)').html('Pay Period: ' + payPeriods[1].format('YYYY-MM-DD'));
+		$('.quickPickMenu div:nth-child(4)').html('Pay Period: ' + payPeriods[2].format('YYYY-MM-DD'));
+
 		// show the applicabale quarters quick picks
 		var currentQuarter = Math.floor(moment().month() / 3) + 1;
 		$('.quickPickMenu .quarter').slice( (-1 * currentQuarter) ).show();
@@ -60,6 +77,16 @@ define(['moment'], function(moment){
             case 'pending': {
                 startDate = moment('01/01/1900').format('MM/DD/YYYY');
                 endDate = moment('01/01/1901').format('MM/DD/YYYY');
+                break;
+            }
+            case 'pay-period': {
+            	endDate = utils.dateSelector.payPeriods[data.value];
+            	if(endDate.date() == 15){
+            		startDate = moment({d: 1, M: endDate.month()}).format('MM/DD/YYYY');
+            	}else{
+            		startDate = moment({d: 16, M: endDate.month()}).format('MM/DD/YYYY');
+            	}
+                endDate = endDate.format('MM/DD/YYYY');
                 break;
             }
             case 'quarter': {
