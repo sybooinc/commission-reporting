@@ -235,7 +235,7 @@ input:focus{
 .dateSelector .quickPick {
   float: left;
   height: 22px;
-  width: 90px;
+  width: 180px;
   padding: 0 6px;
   font-family: arial;
   font-size: 12px;
@@ -258,6 +258,7 @@ input:focus{
   -moz-box-shadow: white 0px 1px 1px;
   box-shadow: white 0px 1px 1px;
   cursor: pointer;
+  position: relative;
 }
 .dateSelector .dropdownButton {
   display: inline-block;
@@ -279,6 +280,7 @@ input:focus{
   cursor: pointer;
   position: absolute;
   top: 6px;
+  right: 6px;
 }
 .dateSelector .quickPickMenu {
   position: absolute;
@@ -286,7 +288,7 @@ input:focus{
   left: 118px;
   z-index: 1000;
   background: #ffffff;
-  width: 90px;
+  width: 180px;
   font-size: 12px;
   -webkit-box-shadow: 0px 0px 5px #333333;
   -moz-box-shadow: 0px 0px 5px #333333;

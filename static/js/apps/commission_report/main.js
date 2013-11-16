@@ -8,7 +8,8 @@ define([
 		, 'utils/color'
 		, 'utils/donut'
 		, 'utils/donutLegendMixin'
-		, 'apps/commission_report/tempMain'
+		, 'utils/dateSelector'
+		, 'apps/commission_report/allFunctions'
 	], function($, _, Backbone){
 	var commissionReport = {};
 
