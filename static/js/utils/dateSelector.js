@@ -6,22 +6,21 @@ define(['moment'], function(moment){
 	utils.dateSelector = {};
 	utils.dateSelector.payPeriods = [];
 
-	utils.dateSelector.initialize = function(){
+	utils.dateSelector.initialize = function(payPeriods){
 		// set the last three pay periods
-		var currentDate = moment().date()
-			, payPeriods = utils.dateSelector.payPeriods;
-		if(currentDate < 15){
-			payPeriods.push( moment( {d: 0, M: moment().month() } ) );
-			payPeriods.push( moment( {d: 15, M: moment().month() - 1} ) );
-			payPeriods.push( moment( {d: 0, M: moment().month() - 1} ) );
-		}else{
-			payPeriods.push( moment( {d: 15, M: moment().month()} ) );
-			payPeriods.push( moment( {d: 0, M: moment().month() } ) );
-			payPeriods.push( moment( {d: 15, M: moment().month() - 1} ) );
-		}
-		$('.quickPickMenu div:nth-child(2)').html('Pay Period: ' + payPeriods[0].format('YYYY-MM-DD'));
-		$('.quickPickMenu div:nth-child(3)').html('Pay Period: ' + payPeriods[1].format('YYYY-MM-DD'));
-		$('.quickPickMenu div:nth-child(4)').html('Pay Period: ' + payPeriods[2].format('YYYY-MM-DD'));
+		var mPayPeriods = _.map(payPeriods, function(payPeriod){
+			return moment(payPeriod, 'MM/DD/YYYY').format('YYYY-MM-DD');
+		});
+
+		$('.quickPickMenu div:nth-child(2)')
+			.data('value', mPayPeriods[0])
+			.html('Pay Period: ' + mPayPeriods[0]);
+		$('.quickPickMenu div:nth-child(3)')
+			.data('value', mPayPeriods[1])
+			.html('Pay Period: ' + mPayPeriods[1]);
+		$('.quickPickMenu div:nth-child(4)')
+			.data('value', mPayPeriods[2])
+			.html('Pay Period: ' + mPayPeriods[2]);
 
 		// show the applicabale quarters quick picks
 		var currentQuarter = Math.floor(moment().month() / 3) + 1;
@@ -80,13 +79,7 @@ define(['moment'], function(moment){
                 break;
             }
             case 'pay-period': {
-            	endDate = utils.dateSelector.payPeriods[data.value];
-            	if(endDate.date() == 15){
-            		startDate = moment({d: 1, M: endDate.month()}).format('MM/DD/YYYY');
-            	}else{
-            		startDate = moment({d: 16, M: endDate.month()}).format('MM/DD/YYYY');
-            	}
-                endDate = endDate.format('MM/DD/YYYY');
+                startDate = endDate = moment(data.value, 'YYYY-MM-DD').format('MM/DD/YYYY');
                 break;
             }
             case 'quarter': {

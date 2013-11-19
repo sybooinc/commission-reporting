@@ -28,24 +28,20 @@ define(['accounting'], function(accounting){
 			currencySymbol = '';
 		}
 		if((typeof number != 'undefined') && (number != 'NaN') && (!isNaN(number))){
-			if (number < 0) {
-				isNegative = true;
-			//} else {
-			//	isNegative = false;
-			} else if (isNegative) {
-				number = -1 * Math.abs(number);
-			}
-
-			 out = accounting.formatMoney(number, {
-				symbol: currencySymbol,
-				precision: 2,
-				thousand: ",",
-				format: {
-					pos : "%s%v",
-					neg : isNegative == true ? "-%s%v" : "%s%v",
-					zero: "%s%v"
+			if(isNegative){
+					number = -1 * number;
 				}
-			});
+
+				 out = accounting.formatMoney(number, {
+					symbol: currencySymbol,
+					precision: 2,
+					thousand: ",",
+					format: {
+						pos : "%s%v",
+						neg : "-%s%v",
+						zero: "%s%v"
+					}
+				});
 
 			if (noCents) out = out.replace(/\.\d\d/, '');
 

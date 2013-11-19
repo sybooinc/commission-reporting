@@ -82,7 +82,12 @@
                         <span class="ytdValue"></span>
                         <span class="ytdLabel">NET YTD</span>
                     </div>
+                </div>
+                <div class="incomeSummaryFrame offset">
                     <div class="incomeSummary"></div>
+                    <div class="incomeDetails hidden">
+                        <table cellpadding="0" cellspacing="0" border="0"></table>
+                    </div>
                 </div>
                 <div class="gridFrame offset">
                     <div class="gridControls">
@@ -134,9 +139,16 @@
         </script>
         <script id="template-summary" type="text/x-handlebars-template">
             {{#each deductions}}
-                <span class="negative">{{this.name}}: {{this.amount}}</span>
+                <div class="negative">{{this.name}}: {{this.amount}}</div>
             {{/each}}
-            <span class="netIncome {{netIncomeSign}}">Net: {{netIncome}}</span>
+        </script>
+        <script id="template-deductions-adjustments-details" type="text/x-handlebars-template">
+            {{#each details}}
+                <div class="table-row">
+                    <div class="table-cell">{{{description}}}</div>
+                    <div class="table-cell">{{amount}}</div>
+                </div>
+            {{/each}}
         </script>
 
         <script data-main="../dist/js/commission_report" src="../js/vendor/require.min.js"></script>

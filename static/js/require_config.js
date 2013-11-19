@@ -28,9 +28,10 @@ define([], function () {
 				}
 			}
 			, paths: {
-				jquery						: 'vendor/jquery.1.9.1.min'
+				jquery							: 'vendor/jquery.1.9.1.min'
 				, jqueryui						: 'vendor/jquery.ui.min'
 				, jqueryDatatable				: 'vendor/jquery.dataTables.min'
+				, 'jquery.dataTables.grouping'  : 'vendor/jquery.dataTables.rowGrouping'
 				, jqueryxml2json				: 'vendor/jquery.xml2json'
 				, underscore					: 'vendor/underscore.min'
 				, raphael						: 'vendor/raphael.2.1.0.min'

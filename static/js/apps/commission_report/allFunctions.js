@@ -6,6 +6,7 @@ define([
     , 'accounting'
     , 'jqueryxml2json'
     , 'jqueryDatatable'
+    , 'jquery.dataTables.grouping'
 ],function($, _, Handlebars, moment, accounting){
 
     var syboo = window.syboo || {};
@@ -228,9 +229,9 @@ define([
                     { "sTitle": "<span data-col-name='syboo_payee_cus_search_id'>Customer</span>", "sClass": "alignLeft customer" },
                     { "sTitle": "<span data-col-name='syboo_product'>Product</span>", "sClass": "alignLeft product" },
                     { "sTitle": "<span data-col-name='syboo_payee_inv_amt'>Investment</span>", "sClass": "alignRight investment" },
-                    { "sTitle": "<span data-col-name='syboo_payee_cnc_amt'>Concession</span>", "sClass": "alignRight concession" },
-                    { "sTitle": "<span data-col-name='syboo_payee_rate'>Rate</span>", "sClass": "alignRight rate" },
-                    { "sTitle": "<span data-col-name='syboo_payee_amt'>Amount Paid</span>", "sClass": "alignRight amountPaid" }
+                    { "sTitle": "<span data-col-name='syboo_payee_cnc_amt'>Dealer Consession</span>", "sClass": "alignRight concession" },
+                    { "sTitle": "<span data-col-name='syboo_payee_rate'>Payout</span>", "sClass": "alignRight rate" },
+                    { "sTitle": "<span data-col-name='syboo_payee_amt'>Rep Commission</span>", "sClass": "alignRight amountPaid" }
                 ],
                 "bSort": false,
                 "bPaginate": false,
@@ -277,6 +278,25 @@ define([
 
         // initialize search
         syboo.utils.GridSearch.init($('.searchBox'), columnNames, syboo.grid.search);
+
+        // adjustments, deductions and others table
+        syboo.incomeDetailsTable = $('.incomeDetails table').dataTable( {
+                //"aaData": rowsData,
+                "aoColumns": [
+                    { "sTitle": "<span data-col-name='syboo_payee_prd_type'>Type</span>", "sClass": "alignLeft product" },
+                    { "sTitle": "<span data-col-name='syboo_product'>Description</span>", "sClass": "alignLeft product" },
+                    { "sTitle": "<span data-col-name='syboo_payee_amt'>Amount</span>", "sClass": "alignRight amountPaid" }
+                ],
+                "bSort": false,
+                "bPaginate": true,
+                "bScrollCollapse": true,
+                "bFilter": false,
+                "bLengthChange": false,
+                "bInfo": false,
+                "bDestroy": true
+                //"sPaginationType": "full_numbers",
+                //"iDisplayLength": 50
+        } ).rowGrouping({bExpandableGrouping: true});
     }
 
     syboo.grid.search = function(searchAry){
@@ -431,11 +451,17 @@ define([
                                 });
                             }
                             if(!_.isUndefined(colData)){
+                                var key = colData.key
+                                    , val;
                                 if(!_.isUndefined(colData.value.Name)){
-                                    rowData.push('<span title="'+ colData.value.Name +'">' + colData.value.Name + '</span>');
+                                    val = colData.value.Name;
                                 }else{
-                                    rowData.push('<span title="'+ colData.value +'">' + colData.value + '</span>');
+                                    val = colData.value;
                                 }
+                                if(key == 'syboo_payee_rate'){
+                                    val = Number(val * 100).toFixed(2) + '%';
+                                }
+                                rowData.push('<span title="'+ val +'">' + val + '</span>');
                             }else{
                                 rowData.push('-');
                             }
@@ -457,6 +483,7 @@ define([
             }
 
             syboo.myDataTable.fnClearTable();
+            console.log('rowsData', rowsData)
             syboo.myDataTable.fnAddData(rowsData);
 
             $('.gridFrame .overlay').hide();
@@ -522,9 +549,14 @@ define([
                 });
             }
             var netIncome = aggTotal - aggDeductions;
+            
             $('.incomeSummary')
-                .html(Handlebars.compile($("#template-summary").html())({deductions: deductions, netIncome: syboo.utils.dollarAndCentsAmount(netIncome, true, true, false, false), netIncomeSign: netIncome >= 0 ? 'positive' : 'negative'}))
-                .fadeIn();
+                .removeClass('active')
+                .html(Handlebars.compile($("#template-summary").html())({deductions: deductions, netIncome: syboo.utils.dollarAndCentsAmount(netIncome, true, true, false, false), netIncomeSign: netIncome >= 0 ? 'positive' : 'negative'}));
+            $('.incomeDetails').hide();    
+            $('.incomeSummaryFrame').fadeIn();
+
+            syboo.getAdjustmentsAndDeductionsDetail();
 
             var sortedAggData = _.sortBy(aggData, function(ad){
                 return -ad.amount;
@@ -589,7 +621,7 @@ define([
     }
 
     syboo.renderVizualizationByProduct = function(productType){
-        $('.incomeSummary').fadeOut();
+        $('.incomeSummaryFrame').fadeOut();
         var vizFetchRequest = '<fetch distinct="false" mapping="logical" aggregate="true" >' +
                                 '<entity name="syboo_transaction" >' +
                                     '<attribute name="syboo_payee_amt" aggregate="sum" alias="commission" />' +
@@ -717,6 +749,7 @@ define([
                                 '</entity>' +
                             '</fetch>';
 
+        console.log('barFetchRequest', barFetchRequest)                            
         syboo.utils.fetchData(barFetchRequest, function(data){
 
             var results = data.Body.ExecuteResponse.ExecuteResult.Results;
@@ -866,6 +899,55 @@ define([
             if(typeof callback == 'function'){
                 callback();
             }
+        });
+    }
+    syboo.getAdjustmentsAndDeductionsDetail = function(){
+        var fetchAdjustmentsAndDeductionsRequest = '<fetch distinct="false" mapping="logical" page="1" count="50" pagingCookie="" >' +
+                            '<entity name="syboo_transaction" >' +
+                                '<attribute name="syboo_payee_prd_type" />' +
+                                '<attribute name="syboo_product" />' +
+                                '<attribute name="syboo_payee_amt" />' +
+                                '<order attribute="syboo_payee_prd_type"/>' +
+                                '<order attribute="syboo_payee_amt" descending="true" />' +
+                                '<filter type="and" >' +
+                                    '<condition attribute="ownerid" operator="eq-userteams" />' +
+                                    syboo.getDateFilter() +
+                                '</filter>' +
+                                '<filter type="or" >' +
+                                    '<condition attribute="syboo_payee_prd_type" operator="eq" value="D~~" />' +
+                                    '<condition attribute="syboo_payee_prd_type" operator="eq" value="A~~" />' +
+                                    '<condition attribute="syboo_payee_prd_type" operator="eq" value="CFD" />' +
+                                '</filter>' +
+                            '</entity>' +
+                        '</fetch>';
+
+        console.log('fetchAdjustmentsAndDeductionsRequest', fetchAdjustmentsAndDeductionsRequest)
+
+        syboo.utils.fetchData(fetchAdjustmentsAndDeductionsRequest, function(data){
+            var rowsData = []
+                , results = data.Body.ExecuteResponse.ExecuteResult.Results;
+
+            if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
+                var entities = results.KeyValuePairOfstringanyType.value.Entities;
+                var entityData = entities.Entity;
+                var rowsData = [];
+                _.each(entityData, function(entity){
+                    if(!_.isUndefined(entity.Attributes)){
+                        var kvData = entity.Attributes.KeyValuePairOfstringanyType;
+                        var prdType = kvData[0].value;
+                        var prdDesc = '<span title="'+ kvData[1].value.Name +'">' + kvData[1].value.Name + '</span>';
+                        var prdAmt = syboo.utils.dollarAndCentsAmount(kvData[2].value.Value, true, true, true, false); ;
+                        rowsData.push([prdType, prdDesc, prdAmt]);
+                    }else{
+                        console.log('failed entity', entity);
+                    }
+                });
+            }
+
+            console.log('rowsData', rowsData);
+
+            syboo.incomeDetailsTable.fnClearTable();
+            syboo.incomeDetailsTable.fnAddData(rowsData);
         });
     }
 

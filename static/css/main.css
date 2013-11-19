@@ -136,6 +136,9 @@ input:focus{
   min-height: 600px;
   position: relative;
 }
+.incomeSummaryFrame {
+  margin-bottom: 10px;
+}
 
 .pagination {
   width: 250px;
@@ -390,6 +393,9 @@ input:focus{
   background: url(../images/sortIndicators.png);
   background-repeat: no-repeat;
   background-position: 0 -900px;
+}
+.dataTable th.concession span, .dataTable th.amountPaid span {
+  white-space: normal;
 }
 .dataTable th.sorting_asc, .dataTable th.sorting_desc {
   background-color: #005581;
@@ -805,32 +811,6 @@ input:focus{
   border-radius: 4px 4px 4px 4px;
 }
 
-.incomeSummary {
-  position: absolute;
-  height: 29px;
-  background-color: #f6f7f8;
-  border-top: 1px solid #c6c7c7;
-  bottom: 0px;
-  display: block;
-  width: 100%;
-  text-transform: uppercase;
-  font-weight: bold;
-  padding: 0;
-  font-size: 10px;
-  display: table;
-}
-.incomeSummary>span {
-  display: table-cell;
-  padding: 2px 4px;
-}
-.incomeSummary>span.negative {
-  color: #ec3000;
-}
-.incomeSummary>span.netIncome {
-  font-weight: bold;
-  text-align: right;
-}
-
 /*
 * search control
 */
@@ -913,7 +893,77 @@ input:focus{
   background: #dadada url(images/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x;
 }
 
-
+/*
+* adjustments and deductions
+*/
+.incomeSummary {
+  background-color: #fff;
+  min-height: 20px;
+  display: table;
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 0;
+  font-size: 11px;
+  cursor: pointer;
+   -webkit-transition-property: all 0.3s;
+  -moz-transition-property: all 0.3s;
+  -o-transition-property: all 0.3s;
+  transition-property: all 0.3s;
+}
+.incomeSummary:hover, .incomeSummary.active {
+  background: #E6EAED;
+}
+.incomeSummary > div {
+  display: table-cell;
+  padding: 2px 0;
+  text-align: center;
+}
+.incomeSummary > div.negative {
+  color: #ec3000;
+}
+.table {
+  display: table;
+  width: 100%;
+}
+.table-row {
+  display: table-row;
+}
+.table-cell {
+  display: table-cell;
+  padding: 4px 0;
+  border-bottom: dotted 1px #ccc;
+}
+.incomeDetails {
+  font-size: 11px;
+}
+.incomeDetails .dataTable thead {
+  display: none;
+}
+.incomeDetails .dataTable .group {
+  background: #ccc;
+  text-align: left;
+  border-bottom: solid 1px #999;
+}
+.dataTables_paginate {
+  text-align: center;
+}
+.dataTables_paginate a {
+  display: inline-block;
+  margin: 4px;
+  padding: 5px;
+  cursor: pointer;
+  width: 100px;
+}
+.paginate_disabled_previous, .paginate_disabled_next {
+  background: #EAEAEA;
+  color: #999;
+  cursor: default;
+}
+.paginate_enabled_previous, .paginate_enabled_next {
+  background-image: linear-gradient(#005581, #0088cc);
+  color: #fff;
+}
 
 
 
