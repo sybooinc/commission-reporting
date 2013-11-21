@@ -39,6 +39,7 @@ define([], function () {
 				, moment						: 'vendor/moment.min'
 				, accounting                    : 'vendor/accounting.min'
 				, handlebars					: 'vendor/handlebars.1'
+				, async							: 'vendor/async'
 			}
 		}
 	);

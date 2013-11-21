@@ -4,10 +4,11 @@ define([
     , 'handlebars'
     , 'moment'
     , 'accounting'
+    , 'async'
     , 'jqueryxml2json'
     , 'jqueryDatatable'
     , 'jquery.dataTables.grouping'
-],function($, _, Handlebars, moment, accounting){
+],function($, _, Handlebars, moment, accounting, Async){
 
     var syboo = window.syboo || {};
 
@@ -46,6 +47,83 @@ define([
         , searchFilter: ''
     }
 
+    syboo.commissionsSummary = {};
+    syboo.commissionsSummary.getCommissionRequest = function(startDate, endDate){
+        return "<fetch distinct='false' mapping='logical' aggregate='true'>" +
+                    '<entity name="syboo_transaction">' +
+                    '<attribute name="syboo_payee_amt" aggregate="sum" alias="aggregatedAmount" />' +
+                        '<filter type="and" >' +
+                            '<condition attribute="ownerid" operator="eq-userteams" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="A~~" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="D~~" />' +
+                            '<condition attribute="syboo_payee_rate" operator="eq" value="1" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
+                        '</filter>' +
+                    '</entity>' +
+                '</fetch>';
+    }
+    syboo.commissionsSummary.getOverridesRequest = function(startDate, endDate){
+        return "<fetch distinct='false' mapping='logical' aggregate='true'>" +
+                    '<entity name="syboo_transaction">' +
+                    '<attribute name="syboo_payee_amt" aggregate="sum" alias="aggregatedAmount" />' +
+                        '<filter type="and" >' +
+                            '<condition attribute="ownerid" operator="eq-userteams" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="A~~" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="D~~" />' +
+                            '<condition attribute="syboo_payee_rate" operator="lt" value="1" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
+                        '</filter>' +
+                    '</entity>' +
+                '</fetch>';
+    }
+    syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest = function(startDate, endDate){
+        return "<fetch distinct='false' mapping='logical' aggregate='true'>" +
+                    '<entity name="syboo_transaction">' +
+                    '<attribute name="syboo_payee_amt" aggregate="sum" alias="aggregatedAmount" />' +
+                        '<filter type="and" >' +
+                            '<condition attribute="ownerid" operator="eq-userteams" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
+                        '</filter>' +
+                        '<filter type="or" >' +
+                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="CFD" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="A~~" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="D~~" />' +
+                        '</filter>' +
+                    '</entity>' +
+                '</fetch>';
+    }
+    syboo.commissionsSummary.getAggregate = function(data){
+        var returnData = '';
+
+        if(data.KeyValuePairOfstringanyType.key == 'EntityCollection'){
+            var entities = data.KeyValuePairOfstringanyType.value.Entities;
+            var entityData = entities.Entity.Attributes.KeyValuePairOfstringanyType;
+            console.log('entityData', entityData)
+            if(!_.isUndefined(entityData) && entityData.key == 'aggregatedAmount'){
+                returnData = entityData.value.Value.Value;
+            }
+        }
+        return Number(returnData);
+    }
+    syboo.commissionsSummary.getData = function(gross, credit, debit){
+        var data = { gross: {}, debit: {}, credit: {}, net: {} }
+            , net = gross + credit + debit;
+        data.gross.isNegative = (gross < 0 ? 'negative' : ''); 
+        data.credit.isNegative = (credit < 0 ? 'negative' : '');
+        data.debit.isNegative = (debit < 0 ? 'negative' : '');
+        data.net.isNegative = (net < 0 ? 'negative' : '');
+
+        data.gross.amount = syboo.utils.dollarAndCentsAmount(gross, true, false, false, false);
+        data.credit.amount = syboo.utils.dollarAndCentsAmount(credit, true, false, false, false);
+        data.debit.amount = syboo.utils.dollarAndCentsAmount(debit, true, false, false, false);
+        data.net.amount = syboo.utils.dollarAndCentsAmount(net, true, false, false, false);
+        return data;
+    }
 
     syboo.utils.GridSearch = {};
 
@@ -214,7 +292,87 @@ define([
         });
     }
 
+    syboo.initSummary = function(){
 
+        var today = moment().format('MM/DD/YYYY')
+            , startOfYear = moment().startOf('year').format('MM/DD/YYYY')
+            , pendingStartDate = moment('01/01/1900').format('MM/DD/YYYY')
+            , pendingEndDate = moment('01/01/1901').format('MM/DD/YYYY');
+
+        Async.parallel({
+            grossCommissionLast: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest('10/10/2013', '10/10/2013'), function(data){
+                    callback(null, data);
+                });
+            }
+            , overridesLast: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getOverridesRequest('10/10/2013', '10/10/2013'), function(data){
+                    callback(null, data);
+                });
+            }
+            , adjustmentsAndDeductionsLast: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest('10/10/2013', '10/10/2013'), function(data){
+                    callback(null, data);
+                });
+            }
+            , grossCommissionYTD: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest(startOfYear, today), function(data){
+                    callback(null, data);
+                });
+            }
+            , overridesYTD: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getOverridesRequest(startOfYear, today), function(data){
+                    callback(null, data);
+                });
+            }
+            , adjustmentsAndDeductionsYTD: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(startOfYear, today), function(data){
+                    callback(null, data);
+                });
+            }
+            , grossCommissionPending: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest(pendingStartDate, pendingEndDate), function(data){
+                    callback(null, data);
+                });
+            }
+            , overridesPending: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getOverridesRequest(pendingStartDate, pendingEndDate), function(data){
+                    callback(null, data);
+                });
+            }
+            , adjustmentsAndDeductionsPending: function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(pendingStartDate, pendingEndDate), function(data){
+                    callback(null, data);
+                });
+            }
+        }, function(err, results){
+            console.log('response', err, results)
+            var data = {};
+            
+            data.last = syboo.commissionsSummary.getData(
+                syboo.commissionsSummary.getAggregate(results.grossCommissionLast.Body.ExecuteResponse.ExecuteResult.Results)
+                , syboo.commissionsSummary.getAggregate(results.overridesLast.Body.ExecuteResponse.ExecuteResult.Results)
+                , syboo.commissionsSummary.getAggregate(results.adjustmentsAndDeductionsLast.Body.ExecuteResponse.ExecuteResult.Results)
+            );
+
+            data.ytd = syboo.commissionsSummary.getData(
+                syboo.commissionsSummary.getAggregate(results.grossCommissionYTD.Body.ExecuteResponse.ExecuteResult.Results)
+                , syboo.commissionsSummary.getAggregate(results.overridesYTD.Body.ExecuteResponse.ExecuteResult.Results)
+                , syboo.commissionsSummary.getAggregate(results.adjustmentsAndDeductionsYTD.Body.ExecuteResponse.ExecuteResult.Results)
+            );
+
+            data.pending = syboo.commissionsSummary.getData(
+                syboo.commissionsSummary.getAggregate(results.grossCommissionPending.Body.ExecuteResponse.ExecuteResult.Results)
+                , syboo.commissionsSummary.getAggregate(results.overridesPending.Body.ExecuteResponse.ExecuteResult.Results)
+                , syboo.commissionsSummary.getAggregate(results.adjustmentsAndDeductionsPending.Body.ExecuteResponse.ExecuteResult.Results)
+            );
+
+
+            var el = $('#summary');
+            el.html( Handlebars.compile( $("#template-commission-summary").html() )( data ) );
+            el.removeClass('loading');
+        });
+    }
     syboo.initGrid = function(){
         var columns = _.keys(syboo.gridVariables.columns);
         var columnNames = _.map(syboo.gridVariables.columns, function(column){
