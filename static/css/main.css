@@ -940,6 +940,14 @@ input:focus{
 }
 .incomeDetails {
   font-size: 11px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.incomeDetails .dataTable th, .incomeDetails .dataTable td {
+  padding: 5px;
+}
+.incomeDetails .dataTable td > span {
+  line-height: 10px;
 }
 .incomeDetails .dataTable thead {
   display: none;

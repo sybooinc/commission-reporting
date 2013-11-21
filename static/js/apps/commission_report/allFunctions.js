@@ -446,7 +446,7 @@ define([
                     { "sTitle": "<span data-col-name='syboo_payee_amt'>Amount</span>", "sClass": "alignRight amountPaid" }
                 ],
                 "bSort": false,
-                "bPaginate": true,
+                "bPaginate": false,
                 "bScrollCollapse": true,
                 "bFilter": false,
                 "bLengthChange": false,
