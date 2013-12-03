@@ -57,7 +57,7 @@ define([
                             '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
                             '<condition attribute="syboo_payee_prd_type" operator="ne" value="A~~" />' +
                             '<condition attribute="syboo_payee_prd_type" operator="ne" value="D~~" />' +
-                            '<condition attribute="syboo_payee_rate" operator="eq" value="1" />' +
+                            '<condition attribute="syboo_commissiontype" operator="eq" value="0" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
                         '</filter>' +
@@ -73,7 +73,7 @@ define([
                             '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
                             '<condition attribute="syboo_payee_prd_type" operator="ne" value="A~~" />' +
                             '<condition attribute="syboo_payee_prd_type" operator="ne" value="D~~" />' +
-                            '<condition attribute="syboo_payee_rate" operator="lt" value="1" />' +
+                            '<condition attribute="syboo_commissiontype" operator="eq" value="1" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
                         '</filter>' +
