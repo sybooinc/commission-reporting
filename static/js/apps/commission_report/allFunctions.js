@@ -292,26 +292,26 @@ define([
         });
     }
 
-    syboo.initSummary = function(){
-
+    syboo.initSummary = function(payPeriods){
         var today = moment().format('MM/DD/YYYY')
             , startOfYear = moment().startOf('year').format('MM/DD/YYYY')
             , pendingStartDate = moment('01/01/1900').format('MM/DD/YYYY')
-            , pendingEndDate = moment('01/01/1901').format('MM/DD/YYYY');
+            , pendingEndDate = moment('01/01/1901').format('MM/DD/YYYY')
+            , lastPayDate = moment(payPeriods[0], 'MM/DD/YYYY').format('MM/DD/YYYY');
 
         Async.parallel({
             grossCommissionLast: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest('10/10/2013', '10/10/2013'), function(data){
+                syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest(lastPayDate, lastPayDate), function(data){
                     callback(null, data);
                 });
             }
             , overridesLast: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getOverridesRequest('10/10/2013', '10/10/2013'), function(data){
+                syboo.utils.fetchData(syboo.commissionsSummary.getOverridesRequest(lastPayDate, lastPayDate), function(data){
                     callback(null, data);
                 });
             }
             , adjustmentsAndDeductionsLast: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest('10/10/2013', '10/10/2013'), function(data){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(lastPayDate, lastPayDate), function(data){
                     callback(null, data);
                 });
             }
@@ -354,6 +354,7 @@ define([
                 , syboo.commissionsSummary.getAggregate(results.overridesLast.Body.ExecuteResponse.ExecuteResult.Results)
                 , syboo.commissionsSummary.getAggregate(results.adjustmentsAndDeductionsLast.Body.ExecuteResponse.ExecuteResult.Results)
             );
+            data.last.date = moment(payPeriods[0], 'MM/DD/YYYY').format('YYYY-MM-DD');
 
             data.ytd = syboo.commissionsSummary.getData(
                 syboo.commissionsSummary.getAggregate(results.grossCommissionYTD.Body.ExecuteResponse.ExecuteResult.Results)
