@@ -936,7 +936,7 @@ define([
                     return d.year == new Date().getFullYear();
                 });
                 var thisYearSortedData = _.sortBy(thisYearData, function(d){
-                    return d.month;
+                    return Number(d.month);
                 });
                 var thisYearCommission = _.map(thisYearSortedData, function(d){
                    return Number(d.amount);
@@ -953,7 +953,7 @@ define([
                     return d.year == new Date().getFullYear() - 1;
                 });
                 var lastYearSortedData = _.sortBy(lastYearData, function(d){
-                    return d.month;
+                    return Number(d.month);
                 });
                 var lastYearCommission = _.map(lastYearSortedData, function(d){
                     return Number(d.amount);
