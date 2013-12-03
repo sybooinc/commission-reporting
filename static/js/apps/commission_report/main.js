@@ -57,7 +57,7 @@ define([
 	    syboo.eventBus.on('dateRangeUpdated', syboo.dateRangeUpdated);
 
 	    commissionReport.getLastThreePayPeriods(function(payPeriods){
-	    	syboo.initSummary();
+	    	syboo.initSummary(payPeriods);
 	    	syboo.utils.dateSelector.initialize(payPeriods);
 	    	syboo.initGrid();
 
