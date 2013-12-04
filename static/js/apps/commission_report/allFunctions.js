@@ -97,6 +97,23 @@ define([
                     '</entity>' +
                 '</fetch>';
     }
+    // TODO: Merge it with above function
+    syboo.commissionsSummary.getAdjustmentsAndDeductionsRequestYTD = function(startDate, endDate){
+        return "<fetch distinct='false' mapping='logical' aggregate='true'>" +
+                    '<entity name="syboo_transaction">' +
+                    '<attribute name="syboo_payee_amt" aggregate="sum" alias="aggregatedAmount" />' +
+                        '<filter type="and" >' +
+                            '<condition attribute="ownerid" operator="eq-userteams" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
+                            '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
+                        '</filter>' +
+                        '<filter type="or" >' +
+                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="A~~" />' +
+                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="D~~" />' +
+                        '</filter>' +
+                    '</entity>' +
+                '</fetch>';
+    }
     syboo.commissionsSummary.getAggregate = function(data){
         var returnData = '';
 
@@ -326,7 +343,7 @@ define([
                 });
             }
             , adjustmentsAndDeductionsYTD: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(startOfYear, today), function(data){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequestYTD(startOfYear, today), function(data){
                     callback(null, data);
                 });
             }
@@ -852,6 +869,7 @@ define([
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                         "<condition attribute='syboo_payee_cmm_date'  operator='this-year' value='1' />" +
+                                        '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
                                         syboo.getProductFilter() +
                                     '</filter>' +
                                 '</entity>' +
@@ -903,6 +921,7 @@ define([
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                         '<condition attribute="syboo_payee_cmm_date"  operator="last-x-years" value="2" />' +
+                                        '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
                                         syboo.getProductFilter() +
                                     '</filter>' +
                                 '</entity>' +
