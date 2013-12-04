@@ -54,9 +54,9 @@ define([
                     '<attribute name="syboo_payee_amt" aggregate="sum" alias="aggregatedAmount" />' +
                         '<filter type="and" >' +
                             '<condition attribute="ownerid" operator="eq-userteams" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="A~~" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="D~~" />' +
+                            '<condition attribute="syboo_producttypestr" operator="ne" value="CARRY FORWARD DEDUCTION" />' +
+                            '<condition attribute="syboo_producttypestr" operator="ne" value="ADJUSTMENTS" />' +
+                            '<condition attribute="syboo_producttypestr" operator="ne" value="DEDUCTIONS" />' +
                             '<condition attribute="syboo_commissiontype" operator="eq" value="0" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
@@ -70,9 +70,9 @@ define([
                     '<attribute name="syboo_payee_amt" aggregate="sum" alias="aggregatedAmount" />' +
                         '<filter type="and" >' +
                             '<condition attribute="ownerid" operator="eq-userteams" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="A~~" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="ne" value="D~~" />' +
+                            '<condition attribute="syboo_producttypestr" operator="ne" value="CARRY FORWARD DEDUCTION" />' +
+                            '<condition attribute="syboo_producttypestr" operator="ne" value="ADJUSTMENTS" />' +
+                            '<condition attribute="syboo_producttypestr" operator="ne" value="DEDUCTIONS" />' +
                             '<condition attribute="syboo_commissiontype" operator="eq" value="1" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="'+ startDate +'" />' +
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
@@ -90,9 +90,9 @@ define([
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
                         '</filter>' +
                         '<filter type="or" >' +
-                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="CFD" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="A~~" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="D~~" />' +
+                            '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
+                            '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />' +
+                            '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />' +
                         '</filter>' +
                     '</entity>' +
                 '</fetch>';
@@ -108,8 +108,8 @@ define([
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
                         '</filter>' +
                         '<filter type="or" >' +
-                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="A~~" />' +
-                            '<condition attribute="syboo_payee_prd_type" operator="eq" value="D~~" />' +
+                            '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />' +
+                            '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />' +
                         '</filter>' +
                     '</entity>' +
                 '</fetch>';
@@ -459,7 +459,7 @@ define([
         syboo.incomeDetailsTable = $('.incomeDetails table').dataTable( {
                 //"aaData": rowsData,
                 "aoColumns": [
-                    { "sTitle": "<span data-col-name='syboo_payee_prd_type'>Type</span>", "sClass": "alignLeft product" },
+                    { "sTitle": "<span data-col-name='syboo_producttypestr'>Type</span>", "sClass": "alignLeft product" },
                     { "sTitle": "<span data-col-name='syboo_product'>Description</span>", "sClass": "alignLeft product" },
                     { "sTitle": "<span data-col-name='syboo_payee_amt'>Amount</span>", "sClass": "alignRight amountPaid" }
                 ],
@@ -677,11 +677,11 @@ define([
     }
 
     syboo.renderVizualizationByProductType = function(){
-        var allDeductions = ['D~~', 'A~~', 'CFD'];
+        var allDeductions = ['DEDUCTIONS', 'ADJUSTMENTS', 'CARRY FORWARD DEDUCTION'];
         var vizFetchRequest = '<fetch distinct="false" mapping="logical" aggregate="true" >' +
                                 '<entity name="syboo_transaction" >' +
                                     '<attribute name="syboo_payee_amt" aggregate="sum" alias="commission" />' +
-                                    '<attribute name="syboo_payee_prd_type" alias="productType" groupby="true" />' +
+                                    '<attribute name="syboo_producttypestr" alias="productType" groupby="true" />' +
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                          syboo.getDateFilter() +
@@ -786,12 +786,12 @@ define([
 
     syboo.getDeductionName = function(productType){
         switch(productType){
-            case 'D~~':
+            case 'DEDUCTIONS':
                 return 'Deductions';
-            case 'A~~':
+            case 'ADJUSTMENTS':
                 return 'Adjustments';
-            case 'CFD':
-                return 'Carry Forward Deductions';
+            case 'CARRY FORWARD DEDUCTION':
+                return 'Carry Forward Deduction';
         }
         return '';
     }
@@ -869,7 +869,7 @@ define([
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                         "<condition attribute='syboo_payee_cmm_date'  operator='this-year' value='1' />" +
-                                        '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
+                                        '<condition attribute="syboo_producttypestr" operator="ne" value="CARRY FORWARD DEDUCTION" />' +
                                         syboo.getProductFilter() +
                                     '</filter>' +
                                 '</entity>' +
@@ -921,7 +921,7 @@ define([
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                         '<condition attribute="syboo_payee_cmm_date"  operator="last-x-years" value="2" />' +
-                                        '<condition attribute="syboo_payee_prd_type" operator="ne" value="CFD" />' +
+                                        '<condition attribute="syboo_producttypestr" operator="ne" value="CARRY FORWARD DEDUCTION" />' +
                                         syboo.getProductFilter() +
                                     '</filter>' +
                                 '</entity>' +
@@ -1082,19 +1082,19 @@ define([
     syboo.getAdjustmentsAndDeductionsDetail = function(){
         var fetchAdjustmentsAndDeductionsRequest = '<fetch distinct="false" mapping="logical" page="1" count="50" pagingCookie="" >' +
                             '<entity name="syboo_transaction" >' +
-                                '<attribute name="syboo_payee_prd_type" />' +
+                                '<attribute name="syboo_producttypestr" />' +
                                 '<attribute name="syboo_product" />' +
                                 '<attribute name="syboo_payee_amt" />' +
-                                '<order attribute="syboo_payee_prd_type"/>' +
+                                '<order attribute="syboo_producttypestr"/>' +
                                 '<order attribute="syboo_payee_amt" descending="true" />' +
                                 '<filter type="and" >' +
                                     '<condition attribute="ownerid" operator="eq-userteams" />' +
                                     syboo.getDateFilter() +
                                 '</filter>' +
                                 '<filter type="or" >' +
-                                    '<condition attribute="syboo_payee_prd_type" operator="eq" value="D~~" />' +
-                                    '<condition attribute="syboo_payee_prd_type" operator="eq" value="A~~" />' +
-                                    '<condition attribute="syboo_payee_prd_type" operator="eq" value="CFD" />' +
+                                    '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />' +
+                                    '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />' +
+                                    '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
                                 '</filter>' +
                             '</entity>' +
                         '</fetch>';
@@ -1141,7 +1141,7 @@ define([
         if(_.isUndefined(syboo.productType)){
             return '';
         }
-        return '<condition attribute="syboo_payee_prd_type"  operator="eq" value="'+ syboo.productType +'" />';
+        return '<condition attribute="syboo_producttypestr"  operator="eq" value="'+ syboo.productType +'" />';
     }
     syboo.getDateFilter = function(){
         return '<condition attribute="syboo_payee_cmm_date"  operator="on-or-after" value="'+ syboo.startDate +'" /><condition attribute="syboo_payee_cmm_date"  operator="on-or-before" value="'+ syboo.endDate +'" />';
