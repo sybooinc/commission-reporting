@@ -516,16 +516,19 @@ define([
         el.siblings().removeClass('sorting_asc');
         el.siblings().removeClass('sorting_desc');
 
-        if(el.hasClass('sorting_desc')){
-            el
-                .removeClass('sorting_desc')
-                .addClass('sorting_asc');
+        if(!el.hasClass('sorting_asc') && !el.hasClass('sorting_desc')){
+            el.addClass('sorting_asc');
             syboo.gridVariables.orderByDescending = false;
-        }else{
+        }else if(el.hasClass('sorting_asc')){
             el
                 .removeClass('sorting_asc')
                 .addClass('sorting_desc');
             syboo.gridVariables.orderByDescending = true;
+        }else{
+            el
+                .removeClass('sorting_desc')
+                .addClass('sorting_asc');
+            syboo.gridVariables.orderByDescending = false;
         }
 
         syboo.gridVariables.orderByColumn = spanEl.data('col-name');
@@ -611,7 +614,8 @@ define([
 
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
-                var entityData = entities.Entity;
+                var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
+
                 _.each(entityData, function(entity){
                     if(!_.isUndefined(entity.Attributes)){
                         var kvData = entity.Attributes.KeyValuePairOfstringanyType;
@@ -1080,7 +1084,7 @@ define([
         });
     }
     syboo.getAdjustmentsAndDeductionsDetail = function(){
-        var fetchAdjustmentsAndDeductionsRequest = '<fetch distinct="false" mapping="logical" page="1" count="50" pagingCookie="" >' +
+        var fetchAdjustmentsAndDeductionsRequest = '<fetch distinct="false" mapping="logical" >' +
                             '<entity name="syboo_transaction" >' +
                                 '<attribute name="syboo_producttypestr" />' +
                                 '<attribute name="syboo_product" />' +
@@ -1107,7 +1111,7 @@ define([
 
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
-                var entityData = entities.Entity;
+                var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
                 var rowsData = [];
                 _.each(entityData, function(entity){
                     if(!_.isUndefined(entity.Attributes)){
@@ -1121,8 +1125,6 @@ define([
                     }
                 });
             }
-
-            console.log('rowsData', rowsData);
 
             syboo.incomeDetailsTable.fnClearTable();
             syboo.incomeDetailsTable.fnAddData(rowsData);

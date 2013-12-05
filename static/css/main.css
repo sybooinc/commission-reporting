@@ -389,17 +389,23 @@ input:focus{
   background-image: linear-gradient(top, #fafafa, #e1e1e1);
   border: none;
 }
-.dataTable th:hover span {
-  background-position: left -56px;
-}
 .dataTable th span {
   padding: 0 0 0 20px;
-  background: url(../images/sortIndicators.png);
+  background: url(../images/sortIndicators2.png);
   background-repeat: no-repeat;
-  background-position: 0 -900px;
+  background-position: right 5px;
+}
+.dataTable th.alignRight span {
+  background-position: left 5px;
 }
 .dataTable th.concession span, .dataTable th.amountPaid span {
   white-space: normal;
+}
+.dataTable th.alignLeft:hover span {
+  background-position: right -25px;
+}
+.dataTable th.alignRight:hover span {
+  background-position: left -25px;
 }
 .dataTable th.sorting_asc, .dataTable th.sorting_desc {
   background-color: #005581;
@@ -413,24 +419,27 @@ input:focus{
   color: #fff;
   text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
 }
-.dataTable th.sorting_asc span {
-  background-position: left -25px;
+.dataTable th.sorting_asc span, .dataTable th.sorting_asc:hover span {
+  background-position: left 5px;
 }
-.dataTable th.sorting_desc span {
-  background-position: left 4px;
+.dataTable th.sorting_desc span, .dataTable th.sorting_desc:hover span {
+  background-position: left -10px;
+}
+.dataTable th.alignLeft.sorting_asc span, .dataTable th.alignLeft.sorting_asc:hover span {
+  background-position: right 5px;
+}
+.dataTable th.alignLeft.sorting_desc span, .dataTable th.alignLeft.sorting_desc:hover span {
+  background-position: right -10px;
 }
 .dataTable th.alignLeft span {
   padding: 0 20px 0 0;
 }
-.dataTable th.alignLeft:hover span {
-  background-position: right -56px;
-}
-.dataTable th.alignLeft.sorting_asc span {
+/*.dataTable th.alignLeft.sorting_asc span {
   background-position: right -25px;
 }
 .dataTable th.alignLeft.sorting_desc span {
   background-position: right 4px;
-}
+}*/
 .dataTable th.swatch {
   cursor: default;
 }
