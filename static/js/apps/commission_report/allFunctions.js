@@ -386,7 +386,7 @@ define([
             );
 
 
-            var el = $('#summary');
+            var el = $('.commissionsSummary');
             el.html( Handlebars.compile( $("#template-commission-summary").html() )( data ) );
             el.removeClass('loading');
         });
@@ -1162,7 +1162,7 @@ define([
 
     syboo.onProductTypeSelected = function(category){
         syboo.productType = category;
-        $('#commissions .breadcrumb').html('<div class="links"><a href="#" class="allProductTypes">All Product Types</a></div><span>'+ category +'</span>');
+        $('#commissions .breadcrumb').html('<div class="links"><a href="#" class="allProductTypes">All Product Types</a></div><span class="separator">/</span><span>'+ category +'</span>');
         syboo.renderVizualizationByProduct(category);
         syboo.getGridData();
     }

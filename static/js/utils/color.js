@@ -6,7 +6,6 @@
 	utils.Color = {};
 
 	utils.Color.ASSET = 'asset';
-	utils.Color.LIABILITY = 'liability';
 
 	utils.Color.getColorSet = function(numberOfItems, colorFamily, excludeColor) {
 		var colorSet;
@@ -48,19 +47,6 @@
 
 		return colorSet;
 	};
-
-		utils.Color.rainbowColors7 = [
-			'#4375bf',
-			'#17a8e5',
-			'#67e6d3',
-			'#99ffa3',
-			'#f7ff66',
-			'#5550b3',
-			'#8550e6'
-		];
-
-	// a hack
-	utils.Color.rainbowColors15 = utils.Color.rainbowColors7.concat(utils.Color.rainbowColors7);
 
 	utils.Color.assetColors7 = [
 		'#4381bf'
@@ -224,170 +210,6 @@
 		, '#5661bf'
 		, '#435cbf'
 		, '#4368bf'
-	];
-
-	utils.Color.liabilityColors7 = [
-		'#ff4040'
-		, '#ff8833'
-		, '#ffAA33'
-		, '#ffcc33'
-		, '#ffff33'
-		, '#f26d99'
-		, '#cc5cc3'
-	];
-
-	utils.Color.liabilityColors15 = [
-		'#ff490d'
-		, '#ff720d'
-		, '#ff9a0d'
-		, '#ffc20d'
-		, '#ffdb26'
-		, '#ffff59'
-		, '#ffc926'
-		, '#ff9f1a'
-		, '#ff720d'
-		, '#ff5959'
-		, '#e6456d'
-		, '#ff599e'
-		, '#f26dbb'
-		, '#d96cbe'
-		, '#cc5cc3'
-	];
-
-	utils.Color.liabilityColors27 = [
-		'#ff4040'
-		, '#ff5c40'
-		, '#ff7940'
-		, '#ff9640'
-		, '#ffb340'
-		, '#ffcf40'
-		, '#ffe81a'
-		, '#f7ff66'
-		, '#ff8093'
-		, '#f26d95'
-		, '#f25ea1'
-		, '#e650aa'
-		, '#e660c4'
-		, '#e673da'
-		, '#e282ed'
-		, '#c36cd9'
-		, '#b55ce6'
-		, '#a15ce6'
-		, '#8550e6'
-		, '#6e50e6'
-		, '#615ccc'
-		, '#626dd9'
-		, '#8298d9'
-		, '#9bdb79'
-		, '#8fcc52'
-		, '#b1e650'
-		, '#cbf230'
-	];
-
-	utils.Color.liabilityColors40 = [
-		'#FF4040'
-		, '#ff5c40'
-		, '#ff7940'
-		, '#ff9640'
-		, '#ffb340'
-		, '#ffcf40'
-		, '#ffe81a'
-		, '#f7ff66'
-		, '#cbf230'
-		, '#b1e650'
-		, '#8fcc52'
-		, '#86db58'
-		, '#93e67e'
-		, '#8bf285'
-		, '#99ffa3'
-		, '#79f297'
-		, '#5ce693'
-		, '#8ae6bc'
-		, '#91f2d5'
-		, '#67e6d3'
-		, '#6cd9d9'
-		, '#52bacc'
-		, '#1495cc'
-		, '#2983cc'
-		, '#4375bf'
-		, '#4362bf'
-		, '#5661bf'
-		, '#5550b3'
-		, '#6e50e6'
-		, '#8550e6'
-		, '#a15ce6'
-		, '#b55ce6'
-		, '#c36cd9'
-		, '#e282ed'
-		, '#e673da'
-		, '#e660c4'
-		, '#e650aa'
-		, '#f25ea1'
-		, '#cc5276'
-		, '#cc3d53'
-	];
-
-	utils.Color.liabilityColors60 = [
-		'#FF4040'
-		, '#ff5340'
-		, '#ff6640'
-		, '#ff7940'
-		, '#ff8c40'
-		, '#ff9f40'
-		, '#ffb340'
-		, '#ffc640'
-		, '#ffd940'
-		, '#ffe81a'
-		, '#ffff66'
-		, '#dff230'
-		, '#cbf230'
-		, '#b9e650'
-		, '#98d936'
-		, '#8fcc52'
-		, '#7ed941'
-		, '#94d977'
-		, '#93e67e'
-		, '#a3ff99'
-		, '#bfffbf'
-		, '#99ffa3'
-		, '#80ff99'
-		, '#6df295'
-		, '#5ce693'
-		, '#7ee6b2'
-		, '#95e6c5'
-		, '#91f2d5'
-		, '#6df2d8'
-		, '#67e6d9'
-		, '#6cd9d9'
-		, '#52c0cc'
-		, '#3dafcc'
-		, '#14a4cc'
-		, '#2b93d9'
-		, '#4381bf'
-		, '#4375bf'
-		, '#4368bf'
-		, '#435cbf'
-		, '#5661bf'
-		, '#5656bf'
-		, '#6457d9'
-		, '#6e50e6'
-		, '#7d50e6'
-		, '#8b57d9'
-		, '#a15ce6'
-		, '#ae5ce6'
-		, '#b562d9'
-		, '#c36cd9'
-		, '#da73e6'
-		, '#f279f2'
-		, '#e673da'
-		, '#e667cc'
-		, '#e65cbc'
-		, '#e650aa'
-		, '#d94c92'
-		, '#cc477c'
-		, '#cc5276'
-		, '#cc4762'
-		, '#d93644'
 	];
 
 	// set reference back
