@@ -16,20 +16,19 @@
         <script src="/WebResources/ClientGlobalContext.js.aspx"></script>
     </head>
     <body>
-        <div id="summary" class="offset loading">
-            
+        <div class="pageHeader">
+            <div class="commissionsSummary loading">
+            </div>
         </div>
-        <div id="commissions" class="moduleFrame">
-            <div class="frame">
+        <div class="pageBody">
+            <div id="commissions" class="moduleFrame">
                 <div class="featureControls">
-                    <div class="breadcrumb clearfix">
-                        <span>All Product Types</span>
-                    </div>
+                    
                     <div class="dateSelector">
                         <label class="dateSelectorLabel">Commission Date</label>
                         <div class="quickPick">
                             <span>Net Rep Commission Due</span>
-                            <a href="" class="dropdownButton">▾</a>
+                            <a href="" class="dropdownButton"></a>
                         </div>
                         <div class="dateRange">
                             <input type="text" class="dpDate startDate">
@@ -53,6 +52,9 @@
                 <div class="graphFrame offset">
                     <div class="donutAndLegend">
                         <div class="donut">
+                            <div class="breadcrumb clearfix">
+                                <span>All Product Types</span>
+                            </div>
                             <div id="donutSVG">
                                 
                             </div>
@@ -117,7 +119,7 @@
 
         <script id="template-legend" type="text/x-handlebars-template">
             <div class="scrollUp disabled">
-                <div>&#9652;</div>
+                <div></div>
             </div>
             <div class="scrollableArea">
                 <div class="container">
@@ -137,7 +139,7 @@
                 </div>
             </div>
             <div class="scrollDown">
-                <div>&#9662;</div>
+                <div></div>
             </div>
         </script>
         <script id="template-summary" type="text/x-handlebars-template">
@@ -154,39 +156,33 @@
             {{/each}}
         </script>
         <script id="template-commission-summary" type="text/x-handlebars-template">
-            <table cellpadding="5px" cellspacing="0" border="0">
-                <tr class="header">
-                    <td>Next Commission Summary</td>
-                    <td>Last Commission Summary</td>
-                    <td>YTD Commission Summary</td>
-                </tr>
-                <tr>
-                    <td>
-                        <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
-                            <tr><td class="descr">Pending Rep Commission</td><td class="currency">$</td><td class="amount {{pending.gross.isNegative}}">{{pending.gross.amount}}</td></tr>
-                            <tr><td class="descr">Pending Overrides</td><td class="currency">$</td><td class="amount {{pending.credit.isNegative}}">{{pending.credit.amount}}</td></tr>
-                            <tr><td class="descr">Pending Adj & Ded</td><td class="currency">$</td><td class="amount {{pending.debit.isNegative}}">{{pending.debit.amount}}</td></tr>
-                            <tr><td class="descr total">Net Rep Commission Due</td><td class="currency total">$</td><td class="amount total {{pending.net.isNegative}}">{{pending.net.amount}}</td></tr>
-                        </table>
-                    </td>
-                    <td>
-                        <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
-                            <tr><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{last.gross.isNegative}}">{{last.gross.amount}}</td></tr>
-                            <tr><td class="descr">Overrides</td><td class="currency">$</td><td class="amount {{last.credit.isNegative}}">{{last.credit.amount}}</td></tr>
-                            <tr><td class="descr">Adj & Ded</td><td class="currency">$</td><td class="amount {{last.debit.isNegative}}">{{last.debit.amount}}</td></tr>
-                            <tr><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{last.net.isNegative}}">{{last.net.amount}}</td></tr>
-                        </table>
-                    </td>
-                    <td>
-                        <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
-                            <tr><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{ytd.gross.isNegative}}">{{ytd.gross.amount}}</td></tr>
-                            <tr><td class="descr">Overrides</td><td class="currency">$</td><td class="amount {{ytd.credit.isNegative}}">{{ytd.credit.amount}}</td></tr>
-                            <tr><td class="descr">Adj & Ded</td><td class="currency">$</td><td class="amount {{ytd.debit.isNegative}}">{{ytd.debit.amount}}</td></tr>
-                            <tr><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{ytd.net.isNegative}}">{{ytd.net.amount}}</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
+            <div class="pendingSummary table-cell">
+                <div class="title">Next Commission Summary</div>
+                <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td class="descr">Pending Rep Commission</td><td class="currency">$</td><td class="amount {{pending.gross.isNegative}}">{{pending.gross.amount}}</td></tr>
+                    <tr><td class="descr">Pending Overrides</td><td class="currency">$</td><td class="amount {{pending.credit.isNegative}}">{{pending.credit.amount}}</td></tr>
+                    <tr><td class="descr">Pending Adj & Ded</td><td class="currency">$</td><td class="amount {{pending.debit.isNegative}}">{{pending.debit.amount}}</td></tr>
+                    <tr><td class="descr total">Net Rep Commission Due</td><td class="currency total">$</td><td class="amount total {{pending.net.isNegative}}">{{pending.net.amount}}</td></tr>
+                </table>
+            </div>
+            <div class="lastSummary table-cell">
+                <div class="title">Last Commission Summary ({{last.date}})</div>
+                <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{last.gross.isNegative}}">{{last.gross.amount}}</td></tr>
+                    <tr><td class="descr">Overrides</td><td class="currency">$</td><td class="amount {{last.credit.isNegative}}">{{last.credit.amount}}</td></tr>
+                    <tr><td class="descr">Adj & Ded</td><td class="currency">$</td><td class="amount {{last.debit.isNegative}}">{{last.debit.amount}}</td></tr>
+                    <tr><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{last.net.isNegative}}">{{last.net.amount}}</td></tr>
+                </table>
+            </div>
+            <div class="ytdSummary table-cell">
+                <div class="title">YTD Commission Summary</div>
+                <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{ytd.gross.isNegative}}">{{ytd.gross.amount}}</td></tr>
+                    <tr><td class="descr">Overrides</td><td class="currency">$</td><td class="amount {{ytd.credit.isNegative}}">{{ytd.credit.amount}}</td></tr>
+                    <tr><td class="descr">Adj & Ded</td><td class="currency">$</td><td class="amount {{ytd.debit.isNegative}}">{{ytd.debit.amount}}</td></tr>
+                    <tr><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{ytd.net.isNegative}}">{{ytd.net.amount}}</td></tr>
+                </table>
+            </div>
         </script>
 
         <script data-main="../dist/js/commission_report" src="../js/vendor/require.min.js"></script>
