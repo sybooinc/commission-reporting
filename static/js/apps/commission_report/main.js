@@ -48,6 +48,8 @@ define([
 	}
 
 	commissionReport.init = function(){
+		$('body').scrollTop(0);
+		
 		syboo.eventBus = _.extend(this, Backbone.Events);
 
 	    syboo.eventBus.on('sliceMouseover', syboo.onSliceMouseover);
@@ -61,7 +63,7 @@ define([
 	    	syboo.utils.dateSelector.initialize(payPeriods);
 	    	syboo.initGrid();
 
-	    	$('#commissions .quickPickItem.selected').trigger('click');
+	    	$('.quickPickItem.selected').trigger('click');
 
 	    	$(document).on('click', '.breadcrumb .allProductTypes', function(e){
 		        e.preventDefault();
@@ -75,9 +77,11 @@ define([
 	    		var el = $(e.currentTarget);
 	    		if(el.hasClass('active')){
 	    			el.removeClass('active');
+	    			el.find('.tooltip').text('(Click to View Details)');
 	    			$('.incomeDetails').fadeOut();
 	    		}else{
 	    			el.addClass('active');
+	    			el.find('.tooltip').text('(Click to Hide Details)');
 	    			$('.incomeDetails').fadeIn();
 	    		}
 	    	});

@@ -20,35 +20,36 @@
             <div class="commissionsSummary loading">
             </div>
         </div>
-        <div class="pageBody">
-            <div id="commissions" class="moduleFrame">
-                <div class="featureControls">
-                    
-                    <div class="dateSelector">
-                        <label class="dateSelectorLabel">Commission Date</label>
-                        <div class="quickPick">
-                            <span>Net Rep Commission Due</span>
-                            <a href="" class="dropdownButton"></a>
-                        </div>
-                        <div class="dateRange">
-                            <input type="text" class="dpDate startDate">
-                            <label for="to">- to -</label>
-                            <input type="text" class="dpDate endDate">
-                        </div>
-                        <div class="quickPickMenu hidden">
-                            <div class="quickPickItem selected" data-operator="pending">Net Rep Commission Due</div>
-                            <div class="quickPickItem payPeriod"  data-operator="pay-period" data-value="0">Pay Period: </div>
-                            <div class="quickPickItem payPeriod"  data-operator="pay-period" data-value="1">Pay Period: </div>
-                            <div class="quickPickItem payPeriod"  data-operator="pay-period" data-value="2">Pay Period: </div>
-                            <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="3">4th Quarter</div>
-                            <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="2">3rd Quarter</div>
-                            <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="1">2nd Quarter</div>
-                            <div class="quickPickItem quarter"  data-operator="quarter" data-value="0">1st Quarter</div>
-                            <div class="quickPickItem "  data-operator="this-year" data-value="1">Year to Date</div>
-                            <div class="quickPickItem "  data-operator="last-year" data-value="1">Last Year</div>
-                        </div>
+        <div class="featureControls">
+            <div class="wrap clearfix">
+                <div class="dateSelector">
+                    <label class="dateSelectorLabel">Commission Date</label>
+                    <div class="quickPick">
+                        <span>Net Rep Commission Due</span>
+                        <a href="" class="dropdownButton"></a>
+                    </div>
+                    <div class="dateRange">
+                        <input type="text" class="dpDate startDate">
+                        <label for="to">- to -</label>
+                        <input type="text" class="dpDate endDate">
+                    </div>
+                    <div class="quickPickMenu hidden">
+                        <div class="quickPickItem selected" data-operator="pending">Net Rep Commission Due</div>
+                        <div class="quickPickItem payPeriod"  data-operator="pay-period" data-value="0">Pay Period: </div>
+                        <div class="quickPickItem payPeriod"  data-operator="pay-period" data-value="1">Pay Period: </div>
+                        <div class="quickPickItem payPeriod"  data-operator="pay-period" data-value="2">Pay Period: </div>
+                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="3">4th Quarter</div>
+                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="2">3rd Quarter</div>
+                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="1">2nd Quarter</div>
+                        <div class="quickPickItem quarter"  data-operator="quarter" data-value="0">1st Quarter</div>
+                        <div class="quickPickItem "  data-operator="this-year" data-value="1">Year to Date</div>
+                        <div class="quickPickItem "  data-operator="last-year" data-value="1">Last Year</div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="pageBody">
+            <div id="commissions" class="moduleFrame">
                 <div class="graphFrame offset">
                     <div class="donutAndLegend">
                         <div class="donut">
@@ -143,9 +144,12 @@
             </div>
         </script>
         <script id="template-summary" type="text/x-handlebars-template">
-            {{#each deductions}}
-                <div class="negative">{{this.name}}: {{this.amount}}</div>
-            {{/each}}
+            <div>
+                {{#each deductions}}
+                    <div class="negative">{{this.name}}: {{this.amount}}</div>
+                {{/each}}
+            </div>
+            <div class="tooltip">(Click to View Details)</div>
         </script>
         <script id="template-deductions-adjustments-details" type="text/x-handlebars-template">
             {{#each details}}
@@ -156,31 +160,31 @@
             {{/each}}
         </script>
         <script id="template-commission-summary" type="text/x-handlebars-template">
-            <div class="pendingSummary table-cell">
+            <div class="pendingSummary first-child table-cell">
                 <div class="title">Next Commission Summary</div>
                 <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
-                    <tr><td class="descr">Pending Rep Commission</td><td class="currency">$</td><td class="amount {{pending.gross.isNegative}}">{{pending.gross.amount}}</td></tr>
+                    <tr class="first-child"><td class="descr">Pending Rep Commission</td><td class="currency">$</td><td class="amount {{pending.gross.isNegative}}">{{pending.gross.amount}}</td></tr>
                     <tr><td class="descr">Pending Overrides</td><td class="currency">$</td><td class="amount {{pending.credit.isNegative}}">{{pending.credit.amount}}</td></tr>
                     <tr><td class="descr">Pending Adj & Ded</td><td class="currency">$</td><td class="amount {{pending.debit.isNegative}}">{{pending.debit.amount}}</td></tr>
-                    <tr><td class="descr total">Net Rep Commission Due</td><td class="currency total">$</td><td class="amount total {{pending.net.isNegative}}">{{pending.net.amount}}</td></tr>
+                    <tr class="last-child"><td class="descr total">Net Rep Commission Due</td><td class="currency total">$</td><td class="amount total {{pending.net.isNegative}}">{{pending.net.amount}}</td></tr>
                 </table>
             </div>
             <div class="lastSummary table-cell">
                 <div class="title">Last Commission Summary ({{last.date}})</div>
                 <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
-                    <tr><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{last.gross.isNegative}}">{{last.gross.amount}}</td></tr>
+                    <tr class="first-child"><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{last.gross.isNegative}}">{{last.gross.amount}}</td></tr>
                     <tr><td class="descr">Overrides</td><td class="currency">$</td><td class="amount {{last.credit.isNegative}}">{{last.credit.amount}}</td></tr>
                     <tr><td class="descr">Adj & Ded</td><td class="currency">$</td><td class="amount {{last.debit.isNegative}}">{{last.debit.amount}}</td></tr>
-                    <tr><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{last.net.isNegative}}">{{last.net.amount}}</td></tr>
+                    <tr class="last-child"><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{last.net.isNegative}}">{{last.net.amount}}</td></tr>
                 </table>
             </div>
-            <div class="ytdSummary table-cell">
+            <div class="ytdSummary last-child table-cell">
                 <div class="title">YTD Commission Summary</div>
                 <table class="summaryDetails" cellpadding="0" cellspacing="0" border="0">
-                    <tr><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{ytd.gross.isNegative}}">{{ytd.gross.amount}}</td></tr>
+                    <tr class="first-child"><td class="descr">Rep Commission</td><td class="currency">$</td><td class="amount {{ytd.gross.isNegative}}">{{ytd.gross.amount}}</td></tr>
                     <tr><td class="descr">Overrides</td><td class="currency">$</td><td class="amount {{ytd.credit.isNegative}}">{{ytd.credit.amount}}</td></tr>
                     <tr><td class="descr">Adj & Ded</td><td class="currency">$</td><td class="amount {{ytd.debit.isNegative}}">{{ytd.debit.amount}}</td></tr>
-                    <tr><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{ytd.net.isNegative}}">{{ytd.net.amount}}</td></tr>
+                    <tr class="last-child"><td class="descr total">Net Rep Commission Paid</td><td class="currency total">$</td><td class="amount total {{ytd.net.isNegative}}">{{ytd.net.amount}}</td></tr>
                 </table>
             </div>
         </script>

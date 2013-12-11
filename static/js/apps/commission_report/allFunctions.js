@@ -733,7 +733,7 @@ define([
             $('.incomeSummary')
                 .removeClass('active')
                 .html(Handlebars.compile($("#template-summary").html())({deductions: deductions, netIncome: syboo.utils.dollarAndCentsAmount(netIncome, true, true, false, false), netIncomeSign: netIncome >= 0 ? 'positive' : 'negative'}));
-            $('.incomeDetails').hide();    
+            $('.incomeDetails').hide();
             $('.incomeSummaryFrame').fadeIn();
 
             syboo.getAdjustmentsAndDeductionsDetail();
