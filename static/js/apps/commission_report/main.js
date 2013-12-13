@@ -9,6 +9,7 @@ define([
 		, 'utils/donut'
 		, 'utils/donutLegendMixin'
 		, 'utils/dateSelector'
+		, 'utils/gridSearch'
 		, 'apps/commission_report/allFunctions'
 	], function($, _, Backbone){
 	var commissionReport = {};

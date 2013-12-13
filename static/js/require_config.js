@@ -14,6 +14,9 @@ define([], function () {
 					deps : ['jquery', 'jqueryui']
 					, exports : 'dataTable'
 				}
+				, 'jqueryCombobox' : {
+					deps : ['jquery', 'jqueryui']
+				}
 				,'underscore': {
 					exports: '_'
 				}
@@ -32,6 +35,7 @@ define([], function () {
 				, jqueryui						: 'vendor/jquery.ui.min'
 				, jqueryDatatable				: 'vendor/jquery.dataTables.min'
 				, 'jquery.dataTables.grouping'  : 'vendor/jquery.dataTables.rowGrouping'
+				, 'jqueryCombobox'  			: 'vendor/jquery.ui.combobox'
 				, jqueryxml2json				: 'vendor/jquery.xml2json'
 				, underscore					: 'vendor/underscore.min'
 				, raphael						: 'vendor/raphael.2.1.0.min'

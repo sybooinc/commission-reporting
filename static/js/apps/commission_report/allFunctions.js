@@ -453,7 +453,7 @@ define([
         });
 
         // initialize search
-        syboo.utils.GridSearch.init($('.searchBox'), columnNames, syboo.grid.search);
+        syboo.utils.GridSearch2.init($('#search_field'), $('#search_operator'), $('#search_value'), syboo.grid.search);
 
         // adjustments, deductions and others table
         syboo.incomeDetailsTable = $('.incomeDetails table').dataTable( {
@@ -480,19 +480,13 @@ define([
             // clear search
             syboo.gridVariables.searchFilter = '';
         }else{
-            var searchColumnName = searchAry[0];
-            var searchColumn;
-            _.each(syboo.gridVariables.columns, function(column, key){
-                if(column.name == searchColumnName){
-                    searchColumn = key;
-                }
-            });
+            var searchColumn = searchAry[0];
             // exception
             if(searchColumn == 'syboo_product'){
                 searchColumn = 'syboo_productname';
             }
 
-            var searchOperator = syboo.grid.filterOperators[searchAry[1]];
+            var searchOperator = searchAry[1];
             var searchTerm = searchAry[2];
 
             if(_.isUndefined(searchColumn) || _.isUndefined(searchOperator) || _.isUndefined(searchTerm)){
@@ -702,7 +696,7 @@ define([
 
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
-                var entityData = entities.Entity;
+                var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
 
                 _.each(entityData, function(entity){
                     var kvData = entity.Attributes.KeyValuePairOfstringanyType;

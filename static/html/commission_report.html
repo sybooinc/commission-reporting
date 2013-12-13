@@ -97,19 +97,53 @@
                 </div>
                 <div class="gridFrame offset">
                     <div class="gridControls">
-                        <div class="pagination">
+                        
+                        <div class="pagination clearfix">
                             <!--<a class="button first" href="#"></a><a class="button previous" href="#"></a><span class="label">Page 1</span><a class="button next" href="#"></a><a class="button last" href="#"></a>-->
                             <a class="button previous" href="#"></a><span class="label">Page 1</span><a class="button next" href="#"></a>
                         </div>
 
-                        <div class="searchControl">
+                        <div class="searchControls clearfix">
+                            <select id="search_field">
+                              <option value="syboo_payee_trade_date">Trade Date</option>
+                              <option value="syboo_name">Ticket No</option>
+                              <option value="syboo_payee_cus_search_id">Customer</option>
+                              <option value="syboo_product">Product</option>
+                              <option value="syboo_payee_inv_amt">Investment</option>
+                              <option value="syboo_payee_cnc_amt">Dealer Consession</option>
+                              <option value="syboo_payee_rate">Payout</option>
+                              <option value="syboo_payee_amt">Rep Commission</option>
+                            </select>
+                            <select id="search_operator">
+                                <option value="like">begins-with</option>
+                                <option value="like">ends-with</option>
+                                <option value="like">contains</option>
+                                <option value="not-like">does-not-begin-with</option>
+                                <option value="not-like">does-not-end-with</option>
+                                <option value="not-like">does-not-contains</option>
+                                <option value="eq">=</option>
+                                <option value="ne">!=</option>
+                                <option value="gt">></option>
+                                <option value="ge">>=</option>
+                                <option value="lt"><</option>
+                                <option value="le"><=</option>
+                            </select>
+                            <div class="searchBox">
+                                <input type="text" id="search_value" />
+                                <a href="#" class="btn resetHandle hidden">x</a>
+                                <a href="#" class="btn searchHandle"></a>
+                            </div>
+                            <div class="error"></div>
+                        </div>
+
+                        <!--<div class="searchControl">
                             <div class="searchOuter">
                                 <input type="text" placeholder="Search Transactions (eg: product like franklin)" class="searchBox">
                                 <a href="#" class="btn resetHandle hidden">x</a>
                                 <a href="#" class="btn searchHandle"></a>
                             </div>
                             <span class="searchError"></span>
-                        </div>
+                        </div>-->
 
                     </div>
                     <table cellpadding="0" cellspacing="0" border="0" id="example"></table>
