@@ -687,10 +687,10 @@ input:focus{
   font-family: Arial;
 }
 #barChartContainer .barLegend li.previous {
-  border-color: #F25100;
+  border-color: #CCC;
 }
 #barChartContainer .barLegend li.current {
-  border-color: #0088CC;
+  border-color: #2cb56e;
 }
 .barTipPlane {
   position: absolute;

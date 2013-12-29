@@ -96,7 +96,7 @@ define([
 
         if(searchTerm.length > 0){
 
-            switch(searchOperator){
+            switch(searchOperator.val()){
                 case 'begins-with': case 'does-not-begin-with': {
                     searchTerm =  searchTerm + '%';
                     break;
@@ -111,7 +111,7 @@ define([
                 }
             }
 
-            result = [searchField.val(), searchOperator.val(), searchTerm];
+            result = [searchField.val(), searchOperator.find('option:selected').data('operator'), searchTerm];
         }
 
         return result

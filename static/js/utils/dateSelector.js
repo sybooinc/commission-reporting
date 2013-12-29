@@ -44,6 +44,9 @@ define(['moment'], function(moment){
                 });
             }
         });
+
+        // initialize bar chart legend
+        $('#barChartContainer .barLegend').html( Handlebars.compile( $("#template-ytd-legend").html() )( {previousYear: moment().subtract('year', 1).year(), currentYear: moment().year() } ) )
     }
 
     utils.dateSelector.toggleQuickPickMenu = function(e){

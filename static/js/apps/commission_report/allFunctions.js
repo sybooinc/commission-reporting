@@ -81,6 +81,12 @@ define([
                 '</fetch>';
     }
     syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest = function(startDate, endDate){
+        var productFilter = '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
+                            '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />';
+        if(moment().date() < 15){
+            productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />';
+        }
+
         return "<fetch distinct='false' mapping='logical' aggregate='true'>" +
                     '<entity name="syboo_transaction">' +
                     '<attribute name="syboo_payee_amt" aggregate="sum" alias="aggregatedAmount" />' +
@@ -90,9 +96,7 @@ define([
                             '<condition attribute="syboo_payee_cmm_date" operator="on-or-before" value="'+ endDate +'" />' +
                         '</filter>' +
                         '<filter type="or" >' +
-                            '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
-                            '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />' +
-                            '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />' +
+                            productFilter +
                         '</filter>' +
                     '</entity>' +
                 '</fetch>';
@@ -611,7 +615,7 @@ define([
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
 
                 _.each(entityData, function(entity){
-                    if(!_.isUndefined(entity.Attributes)){
+                    if(!_.isUndefined(entity) && !_.isUndefined(entity.Attributes)){
                         var kvData = entity.Attributes.KeyValuePairOfstringanyType;
                         var formattedKVData = entity.FormattedValues.KeyValuePairOfstringstring;
                         var rowData = [];
@@ -657,7 +661,6 @@ define([
             }
 
             syboo.myDataTable.fnClearTable();
-            console.log('rowsData', rowsData)
             syboo.myDataTable.fnAddData(rowsData);
 
             $('.gridFrame .overlay').hide();
@@ -994,7 +997,7 @@ define([
                 .drawBarSeries({
                     series : lastYearCommission
                     , type : 'noisyArea'
-                    , color: '#F25100'
+                    , color: '#CCC'
                     , hoverTips: {
                         show: true,
                         formatter: function(val){
@@ -1007,7 +1010,7 @@ define([
                 .drawBarSeries({
                     series : thisYearCommission
                     , type : 'noisyArea'
-                    , color: '#0088CC'
+                    , color: '#2cb56e'
                     , hoverTips: {
                         show: true,
                         formatter: function(val){
@@ -1053,7 +1056,7 @@ define([
                 var entityData = entities.Entity;
 
                  _.each(entityData, function(entity){
-                    if(!_.isUndefined(entity.Attributes)){
+                    if(!_.isUndefined(entity) && !_.isUndefined(entity.Attributes)){
                         var kvData = entity.Attributes.KeyValuePairOfstringanyType;
                         var teamName = _.find(kvData, function(fd){
                                         return fd.key == 'name';
@@ -1078,6 +1081,12 @@ define([
         });
     }
     syboo.getAdjustmentsAndDeductionsDetail = function(){
+        var productFilter = '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
+                            '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />';
+        if(moment().date() < 15){
+            productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />';
+        }
+        
         var fetchAdjustmentsAndDeductionsRequest = '<fetch distinct="false" mapping="logical" >' +
                             '<entity name="syboo_transaction" >' +
                                 '<attribute name="syboo_producttypestr" />' +
@@ -1090,9 +1099,7 @@ define([
                                     syboo.getDateFilter() +
                                 '</filter>' +
                                 '<filter type="or" >' +
-                                    '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />' +
-                                    '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />' +
-                                    '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
+                                    productFilter +
                                 '</filter>' +
                             '</entity>' +
                         '</fetch>';
@@ -1108,7 +1115,7 @@ define([
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
                 var rowsData = [];
                 _.each(entityData, function(entity){
-                    if(!_.isUndefined(entity.Attributes)){
+                    if(!_.isUndefined(entity) && !_.isUndefined(entity.Attributes)){
                         var kvData = entity.Attributes.KeyValuePairOfstringanyType;
                         var prdType = kvData[0].value;
                         var prdDesc = '<span title="'+ kvData[1].value.Name +'">' + kvData[1].value.Name + '</span>';

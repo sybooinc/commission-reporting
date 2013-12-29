@@ -78,8 +78,6 @@
                     </div>
                     <div id="barChartContainer">
                         <ul class="barLegend">
-                            <li class="previous">2012</li>
-                            <li class="current">2013</li>
                         </ul>
                         <div id="barChart"></div>
                     </div>
@@ -115,18 +113,18 @@
                               <option value="syboo_payee_amt">Rep Commission</option>
                             </select>
                             <select id="search_operator">
-                                <option value="like">begins-with</option>
-                                <option value="like">ends-with</option>
-                                <option value="like">contains</option>
-                                <option value="not-like">does-not-begin-with</option>
-                                <option value="not-like">does-not-end-with</option>
-                                <option value="not-like">does-not-contains</option>
-                                <option value="eq">=</option>
-                                <option value="ne">!=</option>
-                                <option value="gt">></option>
-                                <option value="ge">>=</option>
-                                <option value="lt"><</option>
-                                <option value="le"><=</option>
+                                <option value="begins-with" data-operator="like">begins-with</option>
+                                <option value="ends-with" data-operator="like">ends-with</option>
+                                <option value="contains" data-operator="like">contains</option>
+                                <option value="does-not-begin-with" data-operator="not-like">does-not-begin-with</option>
+                                <option value="does-not-end-with" data-operator="not-like">does-not-end-with</option>
+                                <option value="does-not-contains" data-operator="not-like">does-not-contains</option>
+                                <option value="eq" data-operator="eq">=</option>
+                                <option value="ne" data-operator="ne">!=</option>
+                                <option value="gt" data-operator="gt">></option>
+                                <option value="ge" data-operator="ge">>=</option>
+                                <option value="lt" data-operator="lt"><</option>
+                                <option value="le" data-operator="le"><=</option>
                             </select>
                             <div class="searchBox">
                                 <input type="text" id="search_value" />
@@ -192,6 +190,10 @@
                     <div class="table-cell">{{amount}}</div>
                 </div>
             {{/each}}
+        </script>
+        <script id="template-ytd-legend" type="text/x-handlebars-template">
+            <li class="previous">{{previousYear}}</li>
+            <li class="current">{{currentYear}}</li>
         </script>
         <script id="template-commission-summary" type="text/x-handlebars-template">
             <div class="pendingSummary first-child table-cell">
