@@ -176,12 +176,14 @@
             </div>
         </script>
         <script id="template-summary" type="text/x-handlebars-template">
-            <div>
-                {{#each deductions}}
-                    <div class="negative">{{this.name}}: {{this.amount}}</div>
-                {{/each}}
-            </div>
-            <div class="tooltip">(Click to View Details)</div>
+            {{#if showDeductions}}
+                <div>
+                    {{#each deductions}}
+                        <div class="negative">{{this.name}}: {{this.amount}}</div>
+                    {{/each}}
+                </div>
+                <div class="tooltip">(Click to View Details)</div>
+            {{/if}}
         </script>
         <script id="template-deductions-adjustments-details" type="text/x-handlebars-template">
             {{#each details}}

@@ -822,6 +822,7 @@ input:focus{
 }
 .searchControls .searchBox .btn.resetHandle {
   background-color: #F25100;
+  right: 20px;
 }
 .searchControls .error {
   font-size: 12px;

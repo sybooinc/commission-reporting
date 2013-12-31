@@ -80,11 +80,15 @@ define([
                     '</entity>' +
                 '</fetch>';
     }
-    syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest = function(startDate, endDate){
-        var productFilter = '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
-                            '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />';
-        if(moment().date() < 15){
-            productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />';
+    syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest = function(startDate, endDate, period){
+        var productFilter =  '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />';
+        if(period == 'pending'){
+            productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />';
+        }
+        if(period == 'pending' && moment().date() >= 15){
+            //productFilter += '<condition attribute="syboo_producttypestr" operator="ne" value="DEDUCTIONS" />';
+        }else{
+           productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />'; 
         }
 
         return "<fetch distinct='false' mapping='logical' aggregate='true'>" +
@@ -332,7 +336,7 @@ define([
                 });
             }
             , adjustmentsAndDeductionsLast: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(lastPayDate, lastPayDate), function(data){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(lastPayDate, lastPayDate, 'last'), function(data){
                     callback(null, data);
                 });
             }
@@ -347,7 +351,7 @@ define([
                 });
             }
             , adjustmentsAndDeductionsYTD: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequestYTD(startOfYear, today), function(data){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequestYTD(startOfYear, today, 'YTD'), function(data){
                     callback(null, data);
                 });
             }
@@ -362,7 +366,7 @@ define([
                 });
             }
             , adjustmentsAndDeductionsPending: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(pendingStartDate, pendingEndDate), function(data){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(pendingStartDate, pendingEndDate, 'pending'), function(data){
                     callback(null, data);
                 });
             }
@@ -678,6 +682,14 @@ define([
     }
 
     syboo.renderVizualizationByProductType = function(){
+        var additionalFilterBasedOnDay = '', additionalFilterBasedOnPeriod = '';
+        if(syboo.gridVariables.dateRange.operator == 'pending' && moment().date() >= 15){
+            additionalFilterBasedOnDay = '<condition attribute="syboo_producttypestr" operator="ne" value="DEDUCTIONS" />';
+        }
+        if(syboo.gridVariables.dateRange.operator != 'pending'){
+            additionalFilterBasedOnDay = '<condition attribute="syboo_producttypestr" operator="ne" value="CARRY FORWARD DEDUCTION" />';
+        }
+
         var allDeductions = ['DEDUCTIONS', 'ADJUSTMENTS', 'CARRY FORWARD DEDUCTION'];
         var vizFetchRequest = '<fetch distinct="false" mapping="logical" aggregate="true" >' +
                                 '<entity name="syboo_transaction" >' +
@@ -686,6 +698,8 @@ define([
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                          syboo.getDateFilter() +
+                                         additionalFilterBasedOnDay +
+                                         additionalFilterBasedOnPeriod +
                                     '</filter>' +
                                 '</entity>' +
                             '</fetch>';
@@ -726,10 +740,10 @@ define([
                 });
             }
             var netIncome = aggTotal - aggDeductions;
-            
+
             $('.incomeSummary')
                 .removeClass('active')
-                .html(Handlebars.compile($("#template-summary").html())({deductions: deductions, netIncome: syboo.utils.dollarAndCentsAmount(netIncome, true, true, false, false), netIncomeSign: netIncome >= 0 ? 'positive' : 'negative'}));
+                .html(Handlebars.compile($("#template-summary").html())({showDeductions: !_.isEmpty(deductions), deductions: deductions}));
             $('.incomeDetails').hide();
             $('.incomeSummaryFrame').fadeIn();
 
@@ -765,6 +779,7 @@ define([
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                         "<condition attribute='syboo_payee_cmm_date'  operator='this-year' value='1' />" +
+                                        '<condition attribute="syboo_producttypestr" operator="ne" value="CARRY FORWARD DEDUCTION" />' +
                                     '</filter>' +
                                 '</entity>' +
                             '</fetch>';
@@ -1081,10 +1096,15 @@ define([
         });
     }
     syboo.getAdjustmentsAndDeductionsDetail = function(){
-        var productFilter = '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />' +
-                            '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />';
-        if(moment().date() < 15){
-            productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />';
+        var productFilter =  '<condition attribute="syboo_producttypestr" operator="eq" value="ADJUSTMENTS" />';
+        if(syboo.gridVariables.dateRange.operator == 'pending'){
+            productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="CARRY FORWARD DEDUCTION" />';
+        }
+
+        if(syboo.gridVariables.dateRange.operator  == 'pending' && moment().date() >= 15){
+            //productFilter += '<condition attribute="syboo_producttypestr" operator="ne" value="DEDUCTIONS" />';
+        }else{
+           productFilter += '<condition attribute="syboo_producttypestr" operator="eq" value="DEDUCTIONS" />'; 
         }
         
         var fetchAdjustmentsAndDeductionsRequest = '<fetch distinct="false" mapping="logical" >' +

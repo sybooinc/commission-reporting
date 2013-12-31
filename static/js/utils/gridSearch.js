@@ -50,7 +50,6 @@ define([
 		searchValue.siblings('.btn.searchHandle').on('click', function(e){
             e.preventDefault();
             if(validateSearch(searchField, searchOperator, searchValue)){
-                $(this).hide();
                 searchValue.siblings('.btn.resetHandle').show();
                 callback(getSearch(searchField, searchOperator, searchValue));
             }
