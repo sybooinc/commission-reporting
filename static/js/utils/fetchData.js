@@ -59,6 +59,7 @@
 		}).fail(function(jqXHR, textStatus, errorThrown ) {
 			if(console && console.log)
 				console.log('failed to get data', errorThrown);
+			callback(undefined);
 		});
 	};
 
