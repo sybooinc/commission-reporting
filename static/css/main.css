@@ -90,7 +90,7 @@ input:focus{
 }
 
 .pageHeader {
-  background: #333;
+  background: #102252;
   color: #fff;
   position: fixed;
   top: 0;
@@ -509,10 +509,10 @@ input:focus{
   cursor: auto;
 }
 .dataTable .customer>span {
-  width: 90px;
+  width: 190px;
 }
 .dataTable .product>span {
-  width: 300px;
+  width: 200px;
 }
 .dataTableTotals {
   width: 100%;
