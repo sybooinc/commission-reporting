@@ -30,6 +30,10 @@ define([
 							'</fetch>';
 
         syboo.utils.fetchData(fetchPayPeriodsRequest, function(data){
+        	if(_.isUndefined(data)){
+        		callback([]);
+        		return;
+        	}
             var rowsData = []
                 , results = data.Body.ExecuteResponse.ExecuteResult.Results;
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){

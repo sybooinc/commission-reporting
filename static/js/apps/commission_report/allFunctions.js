@@ -136,18 +136,26 @@ define([
         return Number(returnData);
     }
     syboo.commissionsSummary.getData = function(gross, credit, debit){
-        var data = { gross: {}, debit: {}, credit: {}, net: {} }
-            , net = gross + credit + debit;
-        data.gross.isNegative = (gross < 0 ? 'negative' : ''); 
-        data.credit.isNegative = (credit < 0 ? 'negative' : '');
-        data.debit.isNegative = (debit < 0 ? 'negative' : '');
-        data.net.isNegative = (net < 0 ? 'negative' : '');
+        var data = { gross: {}, debit: {}, credit: {}, net: {} };
+        if(_.isNumber(gross) && _.isNumber(credit) && _.isNumber(debit)){
+            var net = gross + credit + debit;
+            data.gross.isNegative = (gross < 0 ? 'negative' : ''); 
+            data.credit.isNegative = (credit < 0 ? 'negative' : '');
+            data.debit.isNegative = (debit < 0 ? 'negative' : '');
+            data.net.isNegative = (net < 0 ? 'negative' : '');
 
-        data.gross.amount = syboo.utils.dollarAndCentsAmount(gross, true, false, false, false);
-        data.credit.amount = syboo.utils.dollarAndCentsAmount(credit, true, false, false, false);
-        data.debit.amount = syboo.utils.dollarAndCentsAmount(debit, true, false, false, false);
-        data.net.amount = syboo.utils.dollarAndCentsAmount(net, true, false, false, false);
-        return data;
+            data.gross.amount = syboo.utils.dollarAndCentsAmount(gross, true, false, false, false);
+            data.credit.amount = syboo.utils.dollarAndCentsAmount(credit, true, false, false, false);
+            data.debit.amount = syboo.utils.dollarAndCentsAmount(debit, true, false, false, false);
+            data.net.amount = syboo.utils.dollarAndCentsAmount(net, true, false, false, false);
+            return data;
+        }else{
+            data.gross.amount = '';
+            data.credit.amount = '';
+            data.debit.amount = '';
+            data.net.amount = '';
+            return data;
+        }
     }
 
     syboo.utils.GridSearch = {};
@@ -321,26 +329,11 @@ define([
         var today = moment().format('MM/DD/YYYY')
             , startOfYear = moment().startOf('year').format('MM/DD/YYYY')
             , pendingStartDate = moment('01/01/1900').format('MM/DD/YYYY')
-            , pendingEndDate = moment('01/01/1901').format('MM/DD/YYYY')
-            , lastPayDate = moment(payPeriods[0], 'MM/DD/YYYY').format('MM/DD/YYYY');
+            , pendingEndDate = moment('01/01/1901').format('MM/DD/YYYY');
+            //, lastPayDate = moment(payPeriods[0], 'MM/DD/YYYY').format('MM/DD/YYYY');
 
-        Async.parallel({
-            grossCommissionLast: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest(lastPayDate, lastPayDate), function(data){
-                    callback(null, data);
-                });
-            }
-            , overridesLast: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getOverridesRequest(lastPayDate, lastPayDate), function(data){
-                    callback(null, data);
-                });
-            }
-            , adjustmentsAndDeductionsLast: function(callback){
-                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(lastPayDate, lastPayDate, 'last'), function(data){
-                    callback(null, data);
-                });
-            }
-            , grossCommissionYTD: function(callback){
+        var serviceCalls = {
+            grossCommissionYTD: function(callback){
                 syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest(startOfYear, today), function(data){
                     callback(null, data);
                 });
@@ -370,16 +363,43 @@ define([
                     callback(null, data);
                 });
             }
-        }, function(err, results){
+        }
+
+        if(!_.isUndefined(payPeriods[0])){
+            var lastPayDate = moment(payPeriods[0], 'MM/DD/YYYY').format('MM/DD/YYYY');
+            serviceCalls.grossCommissionLast = function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getCommissionRequest(lastPayDate, lastPayDate), function(data){
+                    callback(null, data);
+                });
+            }
+            serviceCalls.overridesLast = function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getOverridesRequest(lastPayDate, lastPayDate), function(data){
+                    callback(null, data);
+                });
+            }
+            serviceCalls.adjustmentsAndDeductionsLast = function(callback){
+                syboo.utils.fetchData(syboo.commissionsSummary.getAdjustmentsAndDeductionsRequest(lastPayDate, lastPayDate, 'last'), function(data){
+                    callback(null, data);
+                });
+            }
+        }
+
+        Async.parallel(serviceCalls, function(err, results){
             console.log('response', err, results)
             var data = {};
             
-            data.last = syboo.commissionsSummary.getData(
-                syboo.commissionsSummary.getAggregate(results.grossCommissionLast.Body.ExecuteResponse.ExecuteResult.Results)
-                , syboo.commissionsSummary.getAggregate(results.overridesLast.Body.ExecuteResponse.ExecuteResult.Results)
-                , syboo.commissionsSummary.getAggregate(results.adjustmentsAndDeductionsLast.Body.ExecuteResponse.ExecuteResult.Results)
-            );
+            if(!_.isUndefined(results.grossCommissionLast) &&!_.isUndefined(results.overridesLast) &&!_.isUndefined(results.adjustmentsAndDeductionsLast)){
+                data.last = syboo.commissionsSummary.getData(
+                    syboo.commissionsSummary.getAggregate(results.grossCommissionLast.Body.ExecuteResponse.ExecuteResult.Results)
+                    , syboo.commissionsSummary.getAggregate(results.overridesLast.Body.ExecuteResponse.ExecuteResult.Results)
+                    , syboo.commissionsSummary.getAggregate(results.adjustmentsAndDeductionsLast.Body.ExecuteResponse.ExecuteResult.Results)
+                );
             data.last.date = moment(payPeriods[0], 'MM/DD/YYYY').format('YYYY-MM-DD');
+            }else{
+                data.last = syboo.commissionsSummary.getData();
+                data.last.date = 'N/A';
+                console.log('data.last', data.last);
+            }
 
             data.ytd = syboo.commissionsSummary.getData(
                 syboo.commissionsSummary.getAggregate(results.grossCommissionYTD.Body.ExecuteResponse.ExecuteResult.Results)
@@ -574,6 +594,7 @@ define([
     }
 
     syboo.getGridData = function(){
+        syboo.gridVariables.pagingCookie = '';
         syboo.getGridPageCount(syboo.getGridRecords);
     }
 
@@ -590,9 +611,6 @@ define([
             columnStr.push("<attribute name='" + col + "' />");
         });
 
-        if(pageNbr == 1){
-            pagingCookie = '';
-        }
         var fetchRequest = "<fetch distinct='false' mapping='logical' page='"+ pageNbr +"' count='"+ rowsPerPage +"' pagingCookie='"+ pagingCookie +"'>" +
                                 '<entity name="syboo_transaction">' +
                                     columnStr.join('') +
