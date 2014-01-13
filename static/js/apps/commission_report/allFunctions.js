@@ -128,7 +128,6 @@ define([
         if(data.KeyValuePairOfstringanyType.key == 'EntityCollection'){
             var entities = data.KeyValuePairOfstringanyType.value.Entities;
             var entityData = entities.Entity.Attributes.KeyValuePairOfstringanyType;
-            console.log('entityData', entityData)
             if(!_.isUndefined(entityData) && entityData.key == 'aggregatedAmount'){
                 returnData = entityData.value.Value.Value;
             }
@@ -385,7 +384,6 @@ define([
         }
 
         Async.parallel(serviceCalls, function(err, results){
-            console.log('response', err, results)
             var data = {};
             
             if(!_.isUndefined(results.grossCommissionLast) &&!_.isUndefined(results.overridesLast) &&!_.isUndefined(results.adjustmentsAndDeductionsLast)){
@@ -398,7 +396,6 @@ define([
             }else{
                 data.last = syboo.commissionsSummary.getData();
                 data.last.date = 'N/A';
-                console.log('data.last', data.last);
             }
 
             data.ytd = syboo.commissionsSummary.getData(
@@ -518,8 +515,6 @@ define([
             var searchTerm = searchAry[2];
 
             if(_.isUndefined(searchColumn) || _.isUndefined(searchOperator) || _.isUndefined(searchTerm)){
-                console.log('search error', searchAry);
-                //alert('invalid search');
                 $('.searchBox').parent().addClass('error');
                 $('.searchBox').parent().parent().find('.searchError').html('Invalid search. Please choose search params from list.');
                 return;
@@ -734,6 +729,8 @@ define([
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
 
                 _.each(entityData, function(entity){
+                    if(_.isUndefined(entity))
+                        return;
                     var kvData = entity.Attributes.KeyValuePairOfstringanyType;
                     var commData = _.find(kvData, function(fd){
                                     return fd.key == 'commission';
@@ -742,18 +739,20 @@ define([
                                     return fd.key == 'productType';
                                 });
 
-                    var productTypeValue = productTypeData.value.Value.text;
+                    if(!_.isUndefined(commData) && !_.isUndefined(productTypeData)){
+                        var productTypeValue = productTypeData.value.Value.text;
 
-                    if(!_.contains(allDeductions, productTypeValue)){
-                        var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
-                        aggData.push({name: productTypeValue, id: productTypeValue, amount: Math.abs(Number(commData.value.Value.Value)), formattedAmount: fa});
-                        aggTotal += Number(commData.value.Value.Value);
-                        percentTotal += Math.abs(Number(commData.value.Value.Value));
-                    }else{
-                        deductions[productTypeValue] = {};
-                        deductions[productTypeValue].name = syboo.getDeductionName(productTypeValue);
-                        deductions[productTypeValue].amount = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
-                        aggDeductions += Math.abs(Number(commData.value.Value.Value));
+                        if(!_.contains(allDeductions, productTypeValue)){
+                            var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
+                            aggData.push({name: productTypeValue, id: productTypeValue, amount: Math.abs(Number(commData.value.Value.Value)), formattedAmount: fa});
+                            aggTotal += Number(commData.value.Value.Value);
+                            percentTotal += Math.abs(Number(commData.value.Value.Value));
+                        }else{
+                            deductions[productTypeValue] = {};
+                            deductions[productTypeValue].name = syboo.getDeductionName(productTypeValue);
+                            deductions[productTypeValue].amount = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
+                            aggDeductions += Math.abs(Number(commData.value.Value.Value));
+                        }
                     }
                 });
             }
@@ -810,10 +809,12 @@ define([
                 var entityData = entities.Entity;
 
                 var kvData = entityData.Attributes.KeyValuePairOfstringanyType;
-                var commData = _.find(kvData, function(fd){
-                                return fd.key == 'commission';
-                            });
-                 $('#commissions .ytdValue').html(syboo.utils.dollarAndCentsAmount(kvData.value.Value.Value, true, true, false, false));
+                if(!_.isUndefined(kvData)){
+                    var commData = _.find(kvData, function(fd){
+                                    return fd.key == 'commission';
+                                });
+                    $('#commissions .ytdValue').html(syboo.utils.dollarAndCentsAmount(kvData.value.Value.Value, true, true, false, false));
+                 }
             }
         });
     }
@@ -853,7 +854,6 @@ define([
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
 
-                console.log('entityData', entityData)
                 _.each(entityData, function(entity){
                     var kvData = entity.Attributes.KeyValuePairOfstringanyType;
                     var commData = _.find(kvData, function(fd){

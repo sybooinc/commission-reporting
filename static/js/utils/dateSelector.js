@@ -12,15 +12,24 @@ define(['moment'], function(moment){
 			return moment(payPeriod, 'MM/DD/YYYY').format('YYYY-MM-DD');
 		});
 
-		$('.quickPickMenu div:nth-child(2)')
-			.data('value', mPayPeriods[0])
-			.html('Pay Period: ' + mPayPeriods[0]);
-		$('.quickPickMenu div:nth-child(3)')
-			.data('value', mPayPeriods[1])
-			.html('Pay Period: ' + mPayPeriods[1]);
-		$('.quickPickMenu div:nth-child(4)')
-			.data('value', mPayPeriods[2])
-			.html('Pay Period: ' + mPayPeriods[2]);
+		if(!_.isUndefined(mPayPeriods[0])){
+            $('.quickPickMenu div:nth-child(2)')
+                .data('value', mPayPeriods[0])
+                .html('Pay Period: ' + mPayPeriods[0])
+                .show();
+        }
+        if(!_.isUndefined(mPayPeriods[1])){
+    		$('.quickPickMenu div:nth-child(3)')
+    			.data('value', mPayPeriods[1])
+    			.html('Pay Period: ' + mPayPeriods[1])
+                .show();
+        }
+        if(!_.isUndefined(mPayPeriods[2])){
+    		$('.quickPickMenu div:nth-child(4)')
+    			.data('value', mPayPeriods[2])
+    			.html('Pay Period: ' + mPayPeriods[2])
+                .show();
+        }
 
 		// show the applicabale quarters quick picks
 		var currentQuarter = Math.floor(moment().month() / 3) + 1;
@@ -128,7 +137,7 @@ define(['moment'], function(moment){
             syboo.eventBus.trigger('dateRangeUpdated', {startDate: startDate, endDate: endDate});
         });
     }
-    utils.dateSelector.closeQuickPick = function(e){
+    utils.dateSelector.closeQuickPick = function(event){
         if ($(event.target).closest('.quickPickMenu').length === 0) {
             var quickPickMenu = $('.quickPickMenu');
             if (!quickPickMenu.hasClass('hidden')) {
