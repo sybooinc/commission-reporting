@@ -27,14 +27,18 @@ define(['jquery'], function($){
    function parseXML(node, simple){
     if(!node) return null;
     var txt = '', obj = null, att = null;
-    var nt = node.nodeType, nn = jsVar(node.localName || node.nodeName);
+    //var nt = node.nodeType, nn = jsVar(node.localName || node.nodeName);
+    // for ie8 compatability
+    var nt = node.nodeType, nn = jsVar(node.localName || node.baseName || node.nodeName);
     var nv = node.text || node.nodeValue || '';
     /*DBG*/ //if(window.console) console.log(['x2j',nn,nt,nv.length+' bytes']);
     if(node.childNodes){
      if(node.childNodes.length>0){
       /*DBG*/ //if(window.console) console.log(['x2j',nn,'CHILDREN',node.childNodes]);
       $.each(node.childNodes, function(n,cn){
-       var cnt = cn.nodeType, cnn = jsVar(cn.localName || cn.nodeName);
+       //var cnt = cn.nodeType, cnn = jsVar(cn.localName || cn.nodeName);
+       // for ie8 compatability
+       var cnt = cn.nodeType, cnn = jsVar(cn.localName || cn.baseName || cn.nodeName);
        var cnv = cn.text || cn.nodeValue || '';
        /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>a',cnn,cnt,cnv]);
        if(cnt == 8){

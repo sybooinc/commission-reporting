@@ -921,6 +921,9 @@ input:focus{
 .incomeDetails .dataTable th, .incomeDetails .dataTable td {
   padding: 5px;
 }
+.incomeDetails .dataTable .product>span {
+  width: 700px;
+}
 .incomeDetails .dataTable td > span {
   line-height: 10px;
 }
@@ -999,7 +1002,20 @@ input:focus{
   font-weight: bold;
 }
 
+/* IE8 Specific styles */
+.lt-ie9 .featureControls {
+  border: solid 1px #e1e1e1;
+}
+.lt-ie9 .offset {
+  border: solid 1px #e1e1e1;
+}
 
+.lt-ie9 .dateSelector .quickPickMenu {
+  border: solid 1px #e1e1e1;
+}
+.lt-ie9 .donut table td {
+  white-space: normal;
+}
 
 
 

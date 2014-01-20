@@ -574,12 +574,14 @@ define([
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = entities.Entity.Attributes.KeyValuePairOfstringanyType;
-                if(entityData.key == 'recordCount'){
+                if(!_.isUndefined(entityData) && entityData.key == 'recordCount'){
                     var recordCount = entityData.value.Value.text;
                     syboo.gridVariables.pageCount = Math.ceil(recordCount / syboo.gridVariables.rowsPerPage);
                     if(_.isNumber(syboo.gridVariables.pageCount)){
                         $('.pagination .label').html('Page ' + syboo.gridVariables.pageNbr + ' of ' + syboo.gridVariables.pageCount);
                     }
+                }else{
+                    console.log('Exception Handler: getGridPageCount', entities);
                 }
             }
             if(typeof callback == 'function'){
@@ -664,7 +666,7 @@ define([
                         });
                         rowsData.push(rowData);
                     }else{
-                        console.log('failed entity', entity);
+                        console.log('Exception Handler: getGridRecords', entities);
                     }
                 });
 
@@ -808,13 +810,17 @@ define([
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = entities.Entity;
 
-                var kvData = entityData.Attributes.KeyValuePairOfstringanyType;
-                if(!_.isUndefined(kvData)){
-                    var commData = _.find(kvData, function(fd){
-                                    return fd.key == 'commission';
-                                });
-                    $('#commissions .ytdValue').html(syboo.utils.dollarAndCentsAmount(kvData.value.Value.Value, true, true, false, false));
-                 }
+                if(!_.isUndefined(entityData)){
+                    var kvData = entityData.Attributes.KeyValuePairOfstringanyType;
+                    if(!_.isUndefined(kvData)){
+                        var commData = _.find(kvData, function(fd){
+                                        return fd.key == 'commission';
+                                    });
+                        $('#commissions .ytdValue').html(syboo.utils.dollarAndCentsAmount(kvData.value.Value.Value, true, true, false, false));
+                    }   
+                }else{
+                    console.log('Exception Handler: vizFetchYTD - renderVizualizationByProductType', entities);
+                }
             }
         });
     }
@@ -855,6 +861,9 @@ define([
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
 
                 _.each(entityData, function(entity){
+                    if(_.isUndefined(entity)){
+                        return;
+                    }
                     var kvData = entity.Attributes.KeyValuePairOfstringanyType;
                     var commData = _.find(kvData, function(fd){
                                     return fd.key == 'commission';
@@ -916,11 +925,17 @@ define([
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = entities.Entity;
 
-                var kvData = entityData.Attributes.KeyValuePairOfstringanyType;
-                var commData = _.find(kvData, function(fd){
-                                return fd.key == 'commission';
-                            });
-                 $('#commissions .ytdValue').html(syboo.utils.dollarAndCentsAmount(kvData.value.Value.Value, true, true, false, false));
+                if(!_.isUndefined(entityData)){
+                    var kvData = entityData.Attributes.KeyValuePairOfstringanyType;
+                    if(!_.isUndefined(kvData)){
+                        var commData = _.find(kvData, function(fd){
+                                        return fd.key == 'commission';
+                                    });
+                        $('#commissions .ytdValue').html(syboo.utils.dollarAndCentsAmount(kvData.value.Value.Value, true, true, false, false));
+                    }   
+                }else{
+                    console.log('Exception Handler: vizFetchYTD - renderVizualizationByProductType', entities);
+                }
             }
         });
     }
@@ -968,22 +983,26 @@ define([
 
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
-                var entityData = entities.Entity;
+                var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
 
                 var barData = [];
                 _.each(entityData, function(entity){
-                    var kvData = entity.Attributes.KeyValuePairOfstringanyType;
-                    var commData = _.find(kvData, function(fd){
-                                    return fd.key == 'commission';
-                                });
-                    var yearData = _.find(kvData, function(fd){
-                                    return fd.key == 'year';
-                                });
-                    var monthData = _.find(kvData, function(fd){
-                                    return fd.key == 'month';
-                                });
-                    var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
-                    barData.push({year: yearData.value.Value, month: monthData.value.Value, amount: commData.value.Value.Value, formattedAmount: fa});
+                    if(!_.isUndefined(entity) && !_.isUndefined(entity.Attributes)){
+                        var kvData = entity.Attributes.KeyValuePairOfstringanyType;
+                        var commData = _.find(kvData, function(fd){
+                                        return fd.key == 'commission';
+                                    });
+                        var yearData = _.find(kvData, function(fd){
+                                        return fd.key == 'year';
+                                    });
+                        var monthData = _.find(kvData, function(fd){
+                                        return fd.key == 'month';
+                                    });
+                        var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
+                        barData.push({year: yearData.value.Value, month: monthData.value.Value, amount: commData.value.Value.Value, formattedAmount: fa});
+                    }else{
+                        console.log('Exception Handler: renderBarChart', entities);
+                    }
                 });
 
                 var thisYearData = _.filter(barData, function(d){
@@ -1003,9 +1022,19 @@ define([
                     }
                 }
 
+                var lastYear = new Date().getFullYear() - 1
                 var lastYearData = _.filter(barData, function(d){
-                    return d.year == new Date().getFullYear() - 1;
+                    return d.year == lastYear;
                 });
+                for(var i = 0; i < 12; i++){
+                    var month = i + 1
+                        , monthData = _.find(lastYearData, function(d){
+                        return Number(d.month) == month;
+                    });
+                    if(_.isUndefined(monthData)){
+                        lastYearData.push({year: lastYear, month: month, amount: 0, formattedAmount: 0});
+                    }
+                }
                 var lastYearSortedData = _.sortBy(lastYearData, function(d){
                     return Number(d.month);
                 });
@@ -1160,7 +1189,7 @@ define([
                         var prdAmt = syboo.utils.dollarAndCentsAmount(kvData[2].value.Value, true, true, true, false); ;
                         rowsData.push([prdType, prdDesc, prdAmt]);
                     }else{
-                        console.log('failed entity', entity);
+                        console.log('Exception Handler: getAdjustmentsAndDeductionsDetail', entities);
                     }
                 });
             }

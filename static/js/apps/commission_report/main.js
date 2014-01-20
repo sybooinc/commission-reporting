@@ -38,7 +38,7 @@ define([
                 , results = data.Body.ExecuteResponse.ExecuteResult.Results;
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
-                var entityData = entities.Entity;
+                var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
                 _.each(entityData, function(entity){
                     if(!_.isUndefined(entity.Attributes)){
                         var formattedKVData = entity.FormattedValues.KeyValuePairOfstringstring;
