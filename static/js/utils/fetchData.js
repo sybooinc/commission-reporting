@@ -1,6 +1,6 @@
 (function(){
 
-	// get reference
+	// get references
 	var syboo = window.syboo || {}
 		, utils = syboo.utils || {};
 
