@@ -30,18 +30,13 @@ module.exports = function(grunt) {
           modules: [
               { 
                   name: 'commission_report'
-              },
-              {
-                name: 'commission_report_staging',
-                create: true,
-                include: ['commission_report']
               }
           ],
           // remove files that have been combined during optimization
           removeCombined: true,
           optimizeCss: 'none',
           waitSeconds: 150,
-          optimize: 'none'
+          optimize: 'none',
         }
       }
     },
