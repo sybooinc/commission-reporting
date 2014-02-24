@@ -46,6 +46,8 @@ define([
         , orderByColumn: 'syboo_payee_amt'
         , searchFilter: ''
     }
+    syboo.chartVariables = {};
+    syboo.chartVariables.level = 0;
 
     syboo.commissionsSummary = {};
     syboo.commissionsSummary.getCommissionRequest = function(startDate, endDate){
@@ -689,10 +691,20 @@ define([
 
 
     syboo.renderVizualization = function(){
-        if(_.isUndefined(syboo.productType)){
-            syboo.renderVizualizationByProductType();
-        }else{
-            syboo.renderVizualizationByProduct(syboo.productType);
+        var level = syboo.chartVariables.level;
+        switch(level){
+            case 0: {
+                syboo.renderVizualizationByProductType();
+                break;
+            }
+            case 1: {
+                syboo.renderVizualizationByProduct(syboo.chartVariables.category);
+                break;
+            }
+            case 2: {
+                syboo.renderVizualizationAllProduct();
+                break;
+            }
         }
     }
 
@@ -788,41 +800,7 @@ define([
             syboo.utils.donutLegend.render(syboo.commissionsDonut.categories, $('#commissions .graphFrame'));
         });
 
-        // render bar chart
-        syboo.renderBarChart();
-
-        // render YTD
-        var vizFetchYTD = '<fetch distinct="false" mapping="logical" aggregate="true" >' +
-                                '<entity name="syboo_transaction" >' +
-                                    '<attribute name="syboo_payee_amt" aggregate="sum" alias="commission" />' +
-                                    '<filter type="and" >' +
-                                        '<condition attribute="ownerid" operator="eq-userteams" />' +
-                                        "<condition attribute='syboo_payee_cmm_date'  operator='this-year' value='1' />" +
-                                        '<condition attribute="syboo_producttypestr" operator="ne" value="CARRY FORWARD DEDUCTION" />' +
-                                    '</filter>' +
-                                '</entity>' +
-                            '</fetch>';
-
-        syboo.utils.fetchData(vizFetchYTD, function(data){
-
-            var results = data.Body.ExecuteResponse.ExecuteResult.Results;
-            if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
-                var entities = results.KeyValuePairOfstringanyType.value.Entities;
-                var entityData = entities.Entity;
-
-                if(!_.isUndefined(entityData)){
-                    var kvData = entityData.Attributes.KeyValuePairOfstringanyType;
-                    if(!_.isUndefined(kvData)){
-                        var commData = _.find(kvData, function(fd){
-                                        return fd.key == 'commission';
-                                    });
-                        $('#commissions .ytdValue').html(syboo.utils.dollarAndCentsAmount(kvData.value.Value.Value, true, true, false, false));
-                    }   
-                }else{
-                    console.log('Exception Handler: vizFetchYTD - renderVizualizationByProductType', entities);
-                }
-            }
-        });
+        syboo.renderBarChartSection();
     }
 
     syboo.getDeductionName = function(productType){
@@ -868,12 +846,15 @@ define([
                     var commData = _.find(kvData, function(fd){
                                     return fd.key == 'commission';
                                 });
+                    var productId = _.find(kvData, function(fd){
+                                    return fd.key == 'product';
+                                });
                     var productData = _.find(kvData, function(fd){
                                     return fd.key == 'product_syboo_productname';
                                 });
-                    if(!_.isUndefined(commData) && !_.isUndefined(productData)){
+                    if(!_.isUndefined(commData) && !_.isUndefined(productId) && !_.isUndefined(productData)){
                         var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
-                        aggData.push({name: productData.value.Value, id: productData.value.Value, amount: Math.abs(Number(commData.value.Value.Value)), formattedAmount: fa});
+                        aggData.push({name: productData.value.Value, id: productId.value.Value.Id, amount: Math.abs(Number(commData.value.Value.Value)), formattedAmount: fa});
                         aggTotal += Number(commData.value.Value.Value);
                         percentTotal += Math.abs(Number(commData.value.Value.Value));
                     }else{
@@ -896,13 +877,84 @@ define([
                 delete syboo.commissionsDonut;
             }
             $('#donutSVG').html('');
-            syboo.commissionsDonut = new syboo.utils.Donut(Raphael($('#donutSVG')[0]), 160, 150, 112, 82, sortedAggData, false);
+            syboo.commissionsDonut = new syboo.utils.Donut(Raphael($('#donutSVG')[0]), 160, 150, 112, 82, sortedAggData, true);
             syboo.commissionsDonut.aggTotal = aggTotal;
 
             syboo.utils.donutLegend.render(syboo.commissionsDonut.categories, $('#commissions .graphFrame'));
         });
 
-        // render bar chart
+        syboo.renderBarChartSection();
+    }
+
+    syboo.renderVizualizationAllProduct = function(){
+        $('.incomeSummaryFrame').fadeOut();
+        var vizFetchRequest = '<fetch distinct="false" mapping="logical" >' +
+                                '<entity name="syboo_transaction" >' +
+                                    '<attribute name="syboo_payee_amt" />' +
+                                    '<attribute name="syboo_product" />' +
+                                    '<filter type="and" >' +
+                                        '<condition attribute="ownerid" operator="eq-userteams" />' +
+                                        syboo.getDateFilter() +
+                                        syboo.getProductFilter() +
+                                    '</filter>' +
+                                '</entity>' +
+                            '</fetch>';
+        console.log('vizFetchRequest all product', vizFetchRequest);
+        syboo.utils.fetchData(vizFetchRequest, function(data){
+
+            var results = data.Body.ExecuteResponse.ExecuteResult.Results;
+            var aggData = [], aggTotal = 0, percentTotal = 0;
+
+            if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
+                var entities = results.KeyValuePairOfstringanyType.value.Entities;
+                var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
+
+                _.each(entityData, function(entity, index){
+                    if(_.isUndefined(entity)){
+                        return;
+                    }
+                    var kvData = entity.Attributes.KeyValuePairOfstringanyType;
+                    var commData = _.find(kvData, function(fd){
+                                    return fd.key == 'syboo_payee_amt';
+                                });
+                    var productData = _.find(kvData, function(fd){
+                                    return fd.key == 'syboo_product';
+                                });
+                    if(!_.isUndefined(commData) && !_.isUndefined(productData)){
+                        var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value, true, true, false, false);
+                        aggData.push({name: productData.value.Name, id: productData.value.Id + index, amount: Math.abs(Number(commData.value.Value)), formattedAmount: fa});
+                        aggTotal += Number(commData.value.Value);
+                        percentTotal += Math.abs(Number(commData.value.Value));
+                    }else{
+                        console.log('missing commData or productData', commData, productData);
+                    }
+                });
+            }
+            var sortedAggData = _.sortBy(aggData, function(ad){
+                return -ad.amount;
+            });
+
+            _.each(sortedAggData, function(ad){
+                ad.percent = (Math.abs(Number(ad.amount)) / percentTotal) * 100;
+            });
+
+            $('#commissions .donut .labelAmount').html(syboo.utils.dollarAndCentsAmount(aggTotal, true, true, false, false));
+
+            if(!_.isUndefined(syboo.commissionsDonut)){
+                delete syboo.commissionsDonut;
+            }
+            $('#donutSVG').html('');
+            syboo.commissionsDonut = new syboo.utils.Donut(Raphael($('#donutSVG')[0]), 160, 150, 112, 82, sortedAggData, false);
+            syboo.commissionsDonut.aggTotal = aggTotal;
+
+            syboo.utils.donutLegend.render(syboo.commissionsDonut.categories, $('#commissions .graphFrame'));
+        });
+        
+        syboo.renderBarChartSection();
+    }
+
+    syboo.renderBarChartSection = function(){
+         // render bar chart
         syboo.renderBarChart();
 
         // render YTD
@@ -939,6 +991,7 @@ define([
             }
         });
     }
+
 
     syboo.onSliceMouseover = function (sliceId) {
         var self = this;
@@ -1208,10 +1261,18 @@ define([
     }
 
     syboo.getProductFilter = function(){
-        if(_.isUndefined(syboo.productType)){
-            return '';
+        var level = syboo.chartVariables.level;
+        switch(level){
+            case 1: {
+                return '<condition attribute="syboo_producttypestr"  operator="eq" value="'+ syboo.chartVariables.category +'" />';
+            }
+            case 2: {
+                return '<condition attribute="syboo_product" operator="eq" value="'+ syboo.chartVariables.category +'" />';
+            }
+            default: {
+                return '';
+            }
         }
-        return '<condition attribute="syboo_producttypestr"  operator="eq" value="'+ syboo.productType +'" />';
     }
     syboo.getDateFilter = function(){
         return '<condition attribute="syboo_payee_cmm_date"  operator="on-or-after" value="'+ syboo.startDate +'" /><condition attribute="syboo_payee_cmm_date"  operator="on-or-before" value="'+ syboo.endDate +'" />';
@@ -1228,16 +1289,33 @@ define([
         }
     }
 
-    syboo.onProductTypeSelected = function(category){
-        syboo.productType = category;
-        $('#commissions .breadcrumb').html('<div class="links"><a href="#" class="allProductTypes">All Product Types</a></div><span class="separator">/</span><span>'+ category +'</span>');
-        syboo.renderVizualizationByProduct(category);
+    syboo.onCategorySelected = function(category){
+        var level = syboo.chartVariables.level;
+        
+        if(level == 0){
+            $('#commissions .breadcrumb').html('<div class="links"><a href="#" class="allProductTypes">All Product Types</a></div><span class="separator">/</span><span>'+ category +'</span>');
+            syboo.chartVariables.category = category;
+            syboo.chartVariables.level = 1; 
+            syboo.renderVizualizationByProduct(category);
+        }else if(level == 1){
+            $('#commissions .breadcrumb').html('<div class="links"><a href="#" class="allProductTypes">All Product Types</a><span class="separator">/</span><a href="#" class="backToProductType" data-product-type="'+ syboo.chartVariables.category +'">'+ syboo.chartVariables.category +'</a></div>');
+            syboo.chartVariables.category = category;
+            syboo.chartVariables.level = 2;
+            syboo.renderVizualizationAllProduct(category);
+        }
         syboo.getGridData();
     }
     syboo.allProductTypesSelected = function(){
-        delete syboo.productType;
+        syboo.chartVariables.level = 0;
         $('#commissions .breadcrumb').html('<span>All Product Types</span>');
         syboo.renderVizualizationByProductType();
+        syboo.getGridData();
+    }
+    syboo.backToProductType = function(category){
+        syboo.chartVariables.level = 1;
+        syboo.chartVariables.category = category;
+        $('#commissions .breadcrumb').html('<div class="links"><a href="#" class="allProductTypes">All Product Types</a></div><span class="separator">/</span><span>'+ category +'</span>');
+        syboo.renderVizualizationByProduct(category);
         syboo.getGridData();
     }
 
