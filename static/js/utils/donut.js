@@ -262,7 +262,6 @@ define([
 				}
 
 				, onCategoryClick: function(event) {
-					console.log('onCategoryClick', this)
 					syboo.eventBus.trigger('categorySelected', this.id);
 				}
 			}

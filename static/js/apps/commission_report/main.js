@@ -60,7 +60,7 @@ define([
 	    syboo.eventBus.on('sliceMouseover', syboo.onSliceMouseover);
 	    syboo.eventBus.on('donutMouseout', syboo.onDonutMouseout);
 	    syboo.eventBus.on('onLegendContainerMouseout', syboo.onDonutMouseout);
-	    syboo.eventBus.on('categorySelected', syboo.onCategorySelected);
+	    syboo.eventBus.on('categorySelected', syboo.onProductTypeSelected);
 	    syboo.eventBus.on('dateRangeUpdated', syboo.dateRangeUpdated);
 
 	    commissionReport.getLastThreePayPeriods(function(payPeriods){
@@ -73,14 +73,6 @@ define([
 	    	$(document).on('click', '.breadcrumb .allProductTypes', function(e){
 		        e.preventDefault();
 		        syboo.allProductTypesSelected();
-		    });
-
-		    $(document).on('click', '.breadcrumb .backToProductType', function(e){
-		        e.preventDefault();
-		        var el = $(e.currentTarget),
-		        	productType = el.data('product-type');
-		        	
-		        syboo.backToProductType(productType);
 		    });
 	    
 	    	$(document).on('change', '.hasDatepicker', syboo.utils.dateSelector.onDatePickerChange);
