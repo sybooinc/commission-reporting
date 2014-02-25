@@ -40,7 +40,7 @@ define([
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
                 _.each(entityData, function(entity){
-                    if(!_.isUndefined(entity.Attributes)){
+                    if(!_.isUndefined(entity) && !_.isUndefined(entity.Attributes)){
                         var formattedKVData = entity.FormattedValues.KeyValuePairOfstringstring;
                         rowsData.push(formattedKVData.value);
                     }
