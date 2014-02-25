@@ -684,6 +684,91 @@ define([
             syboo.myDataTable.fnClearTable();
             syboo.myDataTable.fnAddData(rowsData);
 
+            syboo.getDataExport();
+
+            $('.gridFrame .overlay').hide();
+        });
+    }
+
+    syboo.getDataExport = function(callback){
+
+        $('.gridFrame .overlay').show();
+
+        var columns = _.keys(syboo.gridVariables.columns),
+            columnStr = [],
+            colDelim = '","',
+            rowDelim = '"\r\n"';
+
+        _.each(columns, function(col){
+            columnStr.push("<attribute name='" + col + "' />");
+        });
+
+        var fetchRequest = "<fetch distinct='false' mapping='logical'>" +
+                                '<entity name="syboo_transaction">' +
+                                    columnStr.join('') +
+                                    '<filter type="and">' +
+                                        '<condition attribute="ownerid" operator="eq-userteams" />' +
+                                        syboo.getDateFilter() +
+                                        syboo.getSearchFilter() +
+                                        syboo.getProductFilter() +
+                                    '</filter>' +
+                                '</entity>' +
+                            '</fetch>';
+
+        console.log('fetchRequest for data export', fetchRequest)
+
+        
+
+        syboo.utils.fetchData(fetchRequest, function(data){
+            var rowsData = []
+                , results = data.Body.ExecuteResponse.ExecuteResult.Results;
+
+            rowsData.push(columns.join(colDelim));    
+            if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
+                var entities = results.KeyValuePairOfstringanyType.value.Entities;
+                var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
+
+                _.each(entityData, function(entity){
+                    if(!_.isUndefined(entity) && !_.isUndefined(entity.Attributes)){
+                        var kvData = entity.Attributes.KeyValuePairOfstringanyType;
+                        var formattedKVData = entity.FormattedValues.KeyValuePairOfstringstring;
+                        var rowData = [];
+                        _.each(columns, function(col){
+                            var colData = _.find(formattedKVData, function(fd){
+                                return fd.key == col;
+                                });
+                            if(_.isUndefined(colData)){
+                                colData = _.find(kvData, function(d){
+                                    return d.key == col;
+                                });
+                            }
+                            if(!_.isUndefined(colData)){
+                                var key = colData.key
+                                    , val;
+                                if(!_.isUndefined(colData.value.Name)){
+                                    val = colData.value.Name;
+                                }else{
+                                    val = colData.value;
+                                }
+                                if(key == 'syboo_payee_amt'){
+                                    val = val.replace('$', '');
+                                }
+                                if(key == 'syboo_payee_rate'){
+                                    val = Number(val * 100).toFixed(2) + '%';
+                                }
+                                rowData.push(val);
+                            }else{
+                                rowData.push('-');
+                            }
+
+                        });
+                        rowsData.push(rowData.join(colDelim));
+                    }else{
+                        console.log('Exception Handler: getDataExport', entities);
+                    }
+                });
+            }
+            syboo.dataExport = rowsData.join(rowDelim);
             $('.gridFrame .overlay').hide();
         });
     }

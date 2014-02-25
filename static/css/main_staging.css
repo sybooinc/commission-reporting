@@ -1001,6 +1001,21 @@ input:focus{
   font-weight: bold;
 }
 
+
+.exportAsCSV {
+  display: none;
+  float: left;
+  margin: 0 10px 0 0px;
+  padding: 1px 5px 1px 0;
+  width: 24px;
+  height: 24px;
+  background: url("../images/exportToExcel.png") center no-repeat;
+  background-size: 32px;
+}
+.adownload .exportAsCSV{
+  display: inline-block;
+}
+
 /* IE8 Specific styles */
 .lt-ie9 .featureControls {
   border: solid 1px #e1e1e1;

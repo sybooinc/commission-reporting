@@ -29,6 +29,7 @@ define([
 							    '</entity>' +
 							'</fetch>';
 
+        console.log('fetchPayPeriodsRequest', fetchPayPeriodsRequest)
         syboo.utils.fetchData(fetchPayPeriodsRequest, function(data){
         	if(_.isUndefined(data)){
         		callback([]);
@@ -81,6 +82,16 @@ define([
 		        	productType = el.data('product-type');
 		        	
 		        syboo.backToProductType(productType);
+		    });
+
+		    $(document).on('click', '.exportAsCSV', function(e){
+		    	var el = $(e.currentTarget);
+	    		var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(syboo.dataExport);
+	    		console.log('csvData', csvData);
+	    		el.attr({
+	    			'href': csvData,
+	    			'download': 'commissions-export.csv'
+	    		});
 		    });
 	    
 	    	$(document).on('change', '.hasDatepicker', syboo.utils.dateSelector.onDatePickerChange);
