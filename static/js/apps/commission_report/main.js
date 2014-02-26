@@ -85,14 +85,24 @@ define([
 		    });
 
 		    $(document).on('click', '.exportAsCSV', function(e){
+		    	e.preventDefault();
 		    	var el = $(e.currentTarget);
-	    		var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(syboo.dataExport);
-	    		console.log('csvData', csvData);
-	    		el.attr({
-	    			'href': csvData,
-	    			'download': 'commissions-export.csv'
-	    		});
+		    	el.fadeOut();
+		    	syboo.getDataExport(function(data){
+		    		var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(data);
+		    		$('.csvFile').attr({
+		    			'href': csvData
+		    		});
+		    		$('.csvFileWrapper').fadeIn();
+		    	});
 		    });
+
+		    $('.removeCSVFile').click(function(e){
+		    	e.preventDefault();
+		    	$('.csvFileWrapper').fadeOut(function(){
+		    		$('.exportAsCSV').show();
+		    	});
+		    })
 	    
 	    	$(document).on('change', '.hasDatepicker', syboo.utils.dateSelector.onDatePickerChange);
 	    	

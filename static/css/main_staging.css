@@ -207,7 +207,7 @@ input:focus{
 }
 
 .pagination {
-  width: 250px;
+  width: 200px;
   float: left;
   position: relative;
 }
@@ -1014,6 +1014,36 @@ input:focus{
 }
 .adownload .exportAsCSV{
   display: inline-block;
+}
+.csvFileWrapper {
+  float: left;
+  margin-right: 10px;
+  font-size: 14px;
+  padding: 3px 0;
+}
+.csvFileWrapper .csvFile {
+  color: #055871;
+  text-decoration: none;
+}
+.csvFileWrapper .removeCSVFile {
+  margin: 0 5px;
+  text-decoration: none;
+  height: 17px;
+  width: 17px;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+  font-weight: bold;
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.csvFileWrapper .removeCSVFile:hover {
+  background-color: #ff6767;
+  color: #fff;
 }
 
 /* IE8 Specific styles */

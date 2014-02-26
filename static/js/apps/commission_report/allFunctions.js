@@ -684,8 +684,6 @@ define([
             syboo.myDataTable.fnClearTable();
             syboo.myDataTable.fnAddData(rowsData);
 
-            syboo.getDataExport();
-
             $('.gridFrame .overlay').hide();
         });
     }
@@ -734,14 +732,17 @@ define([
                         var formattedKVData = entity.FormattedValues.KeyValuePairOfstringstring;
                         var rowData = [];
                         _.each(columns, function(col){
-                            var colData = _.find(formattedKVData, function(fd){
+                            /*var colData = _.find(formattedKVData, function(fd){
                                 return fd.key == col;
                                 });
                             if(_.isUndefined(colData)){
                                 colData = _.find(kvData, function(d){
                                     return d.key == col;
                                 });
-                            }
+                            }*/
+                            var colData = _.find(kvData, function(d){
+                                return d.key == col;
+                            });
                             if(!_.isUndefined(colData)){
                                 var key = colData.key
                                     , val;
@@ -750,8 +751,8 @@ define([
                                 }else{
                                     val = colData.value;
                                 }
-                                if(key == 'syboo_payee_amt'){
-                                    val = val.replace('$', '');
+                                if( (key == 'syboo_payee_amt') || (key == 'syboo_payee_inv_amt') || (key == 'syboo_payee_cnc_amt') ){
+                                    val = accounting.formatMoney(colData.value.Value);
                                 }
                                 if(key == 'syboo_payee_rate'){
                                     val = Number(val * 100).toFixed(2) + '%';
@@ -768,8 +769,8 @@ define([
                     }
                 });
             }
-            syboo.dataExport = rowsData.join(rowDelim);
             $('.gridFrame .overlay').hide();
+            callback(rowsData.join(rowDelim));
         });
     }
 
