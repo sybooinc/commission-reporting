@@ -5,6 +5,12 @@ define(['moment'], function(moment){
 
 	utils.dateSelector = {};
 	utils.dateSelector.payPeriods = [];
+    var quarterMap = {
+        '0': 'First',
+        '1': 'Second',
+        '2': 'Third',
+        '3': 'Fourth'
+    }
 
 	utils.dateSelector.initialize = function(payPeriods){
 		// set the last three pay periods
@@ -12,31 +18,49 @@ define(['moment'], function(moment){
 			return moment(payPeriod, 'MM/DD/YYYY').format('YYYY-MM-DD');
 		});
 
-		if(!_.isUndefined(mPayPeriods[0])){
-            $('.quickPickMenu div:nth-child(2)')
-                .data('value', mPayPeriods[0])
-                .html('Pay Period: ' + mPayPeriods[0])
-                .show();
-        }
-        if(!_.isUndefined(mPayPeriods[1])){
-    		$('.quickPickMenu div:nth-child(3)')
-    			.data('value', mPayPeriods[1])
-    			.html('Pay Period: ' + mPayPeriods[1])
-                .show();
-        }
-        if(!_.isUndefined(mPayPeriods[2])){
-    		$('.quickPickMenu div:nth-child(4)')
-    			.data('value', mPayPeriods[2])
-    			.html('Pay Period: ' + mPayPeriods[2])
-                .show();
-        }
+        _.each(mPayPeriods, function(payPeriod) {
+            $('.quickPickItem .payPeriods').append($('<option/>', {
+                value: payPeriod,
+                text: payPeriod
+            }));
+        });
 
 		// show the applicabale quarters quick picks
 		var currentQuarter = Math.floor(moment().month() / 3) + 1;
-		$('.quickPickMenu .quarter').slice( (-1 * currentQuarter) ).show();
-		
+        var quarters = [];
+        for(var i = currentQuarter; i > 0; i--){
+            quarters.push(i - 1);
+        }
+        _.each(quarters, function(quarter){
+            $('.quickPickItem .quarters').append($('<option/>', {
+                value: quarter,
+                text: quarterMap[quarter]
+            }));
+        });
+
+        // show the applicable years
+        var allYears = _.map(payPeriods, function(payPeriod){
+            return moment(payPeriod, 'MM/DD/YYYY').year();
+        });
+        var uniqueYears = _.uniq(allYears);
+        _.each(uniqueYears, function(year){
+            $('.quickPickItem .years').append($('<option/>', {
+                value: year,
+                text: year
+            }));
+        });
+
         $('.quickPick').on('click', syboo.utils.dateSelector.toggleQuickPickMenu);
-        $('.quickPickItem').on('click', syboo.utils.dateSelector.onQuickDatePick);
+
+        $('.quickPickItem.pending').on('click', function(e){
+            syboo.utils.dateSelector.onQuickDatePick(e.target);
+        });
+        $('.quickPickItem.dropdown select').on('change', function(e){
+            if($(e.currentTarget).val() != '-1'){
+                syboo.utils.dateSelector.onQuickDatePick($(e.currentTarget).parent('.quickPickItem'));
+            }
+        });
+
         $('.startDate').datepicker({
             beforeShow: function (textbox, instance) {
                 instance.dpDiv.css({
@@ -73,13 +97,14 @@ define(['moment'], function(moment){
             });
         }
     }
-    utils.dateSelector.onQuickDatePick = function(event) {
+    utils.dateSelector.onQuickDatePick = function(el) {
         var self = this;
         var quickPickMenu = $('.quickPickMenu');
-        var data = $(event.target).data();
+        var $el = $(el);
+        var data = $el.data();
 
         $('.quickPickItem.selected').removeClass('selected');
-        $(event.target).addClass('selected');
+        $el.addClass('selected');
 
         var endDate = moment().format('MM/DD/YYYY')
             , startDate;
@@ -91,14 +116,24 @@ define(['moment'], function(moment){
                 break;
             }
             case 'pay-period': {
-                startDate = endDate = moment(data.value, 'YYYY-MM-DD').format('MM/DD/YYYY');
+                startDate = endDate = moment($('.quickPickItem > select.payPeriods').val(), 'YYYY-MM-DD').format('MM/DD/YYYY');
                 break;
             }
             case 'quarter': {
-            	var startMonth = ( ( Number( data.value ) * 3 ) )
+            	var startMonth = ( ( Number( $('.quickPickItem > select.quarters').val() ) * 3 ) )
             		, endMonth = startMonth + 3;
                 startDate = moment( { d: 1, M: startMonth} ).format('MM/DD/YYYY');
                 endDate = moment( { d: 0, M: endMonth} ).format('MM/DD/YYYY');
+                break;
+            }
+            case 'year': {
+                var selectedYear = $('.quickPickItem > select.years').val();
+                if(moment().year() == selectedYear){
+                    startDate = moment().startOf('year').format('MM/DD/YYYY');
+                }else{
+                    endDate = moment('12/31/' + selectedYear).format('MM/DD/YYYY');
+                    startDate = moment('01/01/' + selectedYear).format('MM/DD/YYYY');  
+                }
                 break;
             }
             case 'last-x-days': {
@@ -122,7 +157,12 @@ define(['moment'], function(moment){
 
         quickPickMenu.fadeOut(function() {
             quickPickMenu.addClass('hidden');
-            $('.quickPick>span').html($(event.target).text());
+            if(data.operator == 'pending'){
+                $('.quickPick>span').html($el.text());
+            }else{
+                $('.quickPick>span').html(data.label + ': ' + $el.find('select>option:selected').text());
+            }
+            
             if(data.operator == 'pending'){
                 $('.startDate').val('');
                 $('.endDate').val('');

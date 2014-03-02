@@ -14,22 +14,19 @@ define([
 	], function($, _, Backbone){
 	var commissionReport = {};
 
-	commissionReport.getLastThreePayPeriods = function(callback){
-        var fetchPayPeriodsRequest = '<fetch distinct="true" mapping="logical" count="3" >' +
-							    '<entity name="syboo_transaction" >' +
-							        '<attribute name="syboo_payee_cmm_date" />' +
-							        '<order attribute="syboo_payee_cmm_date" descending="true" />' +
-							        '<filter type="and" >' +
-							            '<condition attribute="ownerid" operator="eq-userteams" />' +
-							        '</filter>' +
-							        '<filter type="or" >' +
-							            '<condition attribute="syboo_payee_cmm_date" operator="this-year" />' +
-							            '<condition attribute="syboo_payee_cmm_date" operator="last-year" />' +
-							        '</filter>' +
-							    '</entity>' +
-							'</fetch>';
+	commissionReport.getAllPayPeriods = function(callback){
+        var fetchPayPeriodsRequest = '<fetch distinct="true" mapping="logical" >' +
+									    '<entity name="syboo_transaction" >' +
+									        '<attribute name="syboo_payee_cmm_date" />' +
+									        '<order attribute="syboo_payee_cmm_date" descending="true" />' +
+									        '<filter type="and" >' +
+									            '<condition attribute="ownerid" operator="eq-userteams" />' +
+									            '<condition attribute="syboo_payee_cmm_date" operator="on-or-after" value="02/01/1900" />' +
+									        '</filter>' +
+									    '</entity>' +
+									'</fetch>';
 
-        console.log('fetchPayPeriodsRequest', fetchPayPeriodsRequest)
+        console.log('fetchAllPayPeriods', fetchPayPeriodsRequest)
         syboo.utils.fetchData(fetchPayPeriodsRequest, function(data){
         	if(_.isUndefined(data)){
         		callback([]);
@@ -64,8 +61,8 @@ define([
 	    syboo.eventBus.on('categorySelected', syboo.onCategorySelected);
 	    syboo.eventBus.on('dateRangeUpdated', syboo.dateRangeUpdated);
 
-	    commissionReport.getLastThreePayPeriods(function(payPeriods){
-	    	syboo.initSummary(payPeriods);
+	    commissionReport.getAllPayPeriods(function(payPeriods){
+	    	syboo.initSummary(payPeriods.slice(0, 3));
 	    	syboo.utils.dateSelector.initialize(payPeriods);
 	    	syboo.initGrid();
 

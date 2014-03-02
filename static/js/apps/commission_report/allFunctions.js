@@ -701,7 +701,7 @@ define([
             columnStr.push("<attribute name='" + col + "' />");
         });
 
-        var fetchRequest = "<fetch distinct='false' mapping='logical'>" +
+        var fetchRequest = "<fetch distinct='false' mapping='logical' count='10000'>" +
                                 '<entity name="syboo_transaction">' +
                                     columnStr.join('') +
                                     '<filter type="and">' +
@@ -718,6 +718,7 @@ define([
         
 
         syboo.utils.fetchData(fetchRequest, function(data){
+            console.log('response received');
             var rowsData = []
                 , results = data.Body.ExecuteResponse.ExecuteResult.Results;
 
@@ -726,6 +727,7 @@ define([
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
 
+                console.log('entityData for loop')
                 _.each(entityData, function(entity){
                     if(!_.isUndefined(entity) && !_.isUndefined(entity.Attributes)){
                         var kvData = entity.Attributes.KeyValuePairOfstringanyType;
@@ -769,6 +771,7 @@ define([
                     }
                 });
             }
+            console.log('export data length', rowsData.length)
             $('.gridFrame .overlay').hide();
             callback(rowsData.join(rowDelim));
         });
@@ -974,10 +977,10 @@ define([
 
     syboo.renderVizualizationAllProduct = function(){
         $('.incomeSummaryFrame').fadeOut();
-        var vizFetchRequest = '<fetch distinct="false" mapping="logical" >' +
+        var vizFetchRequest = '<fetch distinct="false" mapping="logical" aggregate="true"  >' +
                                 '<entity name="syboo_transaction" >' +
-                                    '<attribute name="syboo_payee_amt" />' +
-                                    '<attribute name="syboo_product" />' +
+                                    '<attribute name="syboo_payee_amt" aggregate="sum" alias="commission" />' +
+                                    '<attribute name="syboo_product" alias="product" groupby="true" />' +
                                     '<filter type="and" >' +
                                         '<condition attribute="ownerid" operator="eq-userteams" />' +
                                         syboo.getDateFilter() +
@@ -994,23 +997,23 @@ define([
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
-
+                
                 _.each(entityData, function(entity, index){
                     if(_.isUndefined(entity)){
                         return;
                     }
                     var kvData = entity.Attributes.KeyValuePairOfstringanyType;
                     var commData = _.find(kvData, function(fd){
-                                    return fd.key == 'syboo_payee_amt';
+                                    return fd.key == 'commission'; 
                                 });
                     var productData = _.find(kvData, function(fd){
-                                    return fd.key == 'syboo_product';
+                                    return fd.key == 'product';
                                 });
                     if(!_.isUndefined(commData) && !_.isUndefined(productData)){
-                        var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value, true, true, false, false);
-                        aggData.push({name: productData.value.Name, id: productData.value.Id + index, amount: Math.abs(Number(commData.value.Value)), formattedAmount: fa});
-                        aggTotal += Number(commData.value.Value);
-                        percentTotal += Math.abs(Number(commData.value.Value));
+                        var fa = syboo.utils.dollarAndCentsAmount(commData.value.Value.Value, true, true, false, false);
+                        aggData.push({name: productData.value.Value.Name, id: productData.value.Value.Id + index, amount: Math.abs(Number(commData.value.Value.Value)), formattedAmount: fa});
+                        aggTotal += Number(commData.value.Value.Value);
+                        percentTotal += Math.abs(Number(commData.value.Value.Value));
                     }else{
                         console.log('missing commData or productData', commData, productData);
                     }
@@ -1080,6 +1083,10 @@ define([
 
 
     syboo.onSliceMouseover = function (sliceId) {
+        var level = syboo.chartVariables.level;
+        if(level == 2){
+            return;
+        }
         var self = this;
         var categories = syboo.commissionsDonut.categories;
         var slice = _.find(categories, function(category){
@@ -1092,6 +1099,10 @@ define([
     }
 
     syboo.onDonutMouseout = function(){
+        var level = syboo.chartVariables.level;
+        if(level == 2){
+            return;
+        }
         $('#commissions .donut .labelName').html('Commission');
         $('#commissions .donut .labelAmount').html(syboo.utils.dollarAndCentsAmount(syboo.commissionsDonut.aggTotal, true, true, false, false));
     }
@@ -1406,6 +1417,9 @@ define([
     }
 
     syboo.dateRangeUpdated = function(data){
+        $('.csvFileWrapper').hide();
+        $('.exportAsCSV').show();
+
         syboo.startDate = data.startDate;
         syboo.endDate = data.endDate;
 

@@ -304,7 +304,7 @@ input:focus{
 .dateSelector .quickPick {
   float: left;
   height: 22px;
-  width: 180px;
+  width: 200px;
   padding: 0 6px;
   font-family: arial;
   font-size: 12px;
@@ -340,7 +340,7 @@ input:focus{
   left: 121px;
   z-index: 1000;
   background: #ffffff;
-  width: 192px;
+  width: 212px;
   font-size: 12px;
   -webkit-box-shadow: 0px 2px 5px #333333;
   -moz-box-shadow: 0px 2px 5px #333333;
@@ -367,6 +367,16 @@ input:focus{
 .dateSelector .quickPickMenu .quickPickItem:hover {
   color: white;
   background: #333;
+}
+.dateSelector .quickPickMenu .quickPickItem select {
+  width: 100px;
+  padding: 4px 0;
+}
+.dateSelector .quickPickMenu .quickPickItem span.label {
+  width: 80px;
+  display: inline-block;
+  text-align: right;
+  margin-right: 3px;
 }
 .dateSelector .dateRange {
   float: left;
@@ -1059,6 +1069,10 @@ input:focus{
 }
 .lt-ie9 .donut table td {
   white-space: normal;
+}
+
+.payPeriods {
+  width: 100px;
 }
 
 

@@ -35,16 +35,25 @@
                         <input type="text" class="dpDate endDate">
                     </div>
                     <div class="quickPickMenu hidden">
-                        <div class="quickPickItem selected" data-operator="pending">Net Rep Commission Due</div>
-                        <div class="quickPickItem payPeriod hidden"  data-operator="pay-period" data-value="0">Pay Period: </div>
-                        <div class="quickPickItem payPeriod hidden"  data-operator="pay-period" data-value="1">Pay Period: </div>
-                        <div class="quickPickItem payPeriod hidden"  data-operator="pay-period" data-value="2">Pay Period: </div>
-                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="3">4th Quarter</div>
-                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="2">3rd Quarter</div>
-                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="1">2nd Quarter</div>
-                        <div class="quickPickItem quarter"  data-operator="quarter" data-value="0">1st Quarter</div>
-                        <div class="quickPickItem "  data-operator="this-year" data-value="1">Year to Date</div>
-                        <div class="quickPickItem "  data-operator="last-year" data-value="1">Last Year</div>
+                        <div class="quickPickItem pending selected" data-operator="pending">Net Rep Commission Due</div>
+                        <div class="quickPickItem dropdown pay-period" data-operator="pay-period" data-label="Pay Period">
+                            <span class="label">Pay Period:</span>
+                            <select class="payPeriods">
+                                <option value="-1">Select one</option>
+                            </select>
+                        </div>
+                        <div class="quickPickItem dropdown quarter" data-operator="quarter" data-label="Quarter">
+                            <span class="label">Quarter:</span> 
+                            <select class="quarters">
+                                <option value="-1">Select one</option>
+                            </select>
+                        </div>
+                        <div class="quickPickItem dropdown year" data-operator="year" data-label="Year">
+                            <span class="label">Year:</span>
+                            <select class="years">
+                                <option value="-1">Select one</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
