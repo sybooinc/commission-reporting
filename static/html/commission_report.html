@@ -12,7 +12,8 @@
 
         <link rel="stylesheet" href="../css/normalize.min.css">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-        <link rel="stylesheet" href="../css/main.css">
+        <link rel="stylesheet" href="../css/main_staging.css">
+        <script type="text/javascript" src="../js/vendor/modernizr.custom.js"></script>
         <script src="/WebResources/ClientGlobalContext.js.aspx"></script>
     </head>
     <body>
@@ -34,16 +35,25 @@
                         <input type="text" class="dpDate endDate">
                     </div>
                     <div class="quickPickMenu hidden">
-                        <div class="quickPickItem selected" data-operator="pending">Net Rep Commission Due</div>
-                        <div class="quickPickItem payPeriod hidden"  data-operator="pay-period" data-value="0">Pay Period: </div>
-                        <div class="quickPickItem payPeriod hidden"  data-operator="pay-period" data-value="1">Pay Period: </div>
-                        <div class="quickPickItem payPeriod hidden"  data-operator="pay-period" data-value="2">Pay Period: </div>
-                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="3">4th Quarter</div>
-                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="2">3rd Quarter</div>
-                        <div class="quickPickItem quarter hidden"  data-operator="quarter" data-value="1">2nd Quarter</div>
-                        <div class="quickPickItem quarter"  data-operator="quarter" data-value="0">1st Quarter</div>
-                        <div class="quickPickItem "  data-operator="this-year" data-value="1">Year to Date</div>
-                        <div class="quickPickItem "  data-operator="last-year" data-value="1">Last Year</div>
+                        <div class="quickPickItem pending selected" data-operator="pending">Net Rep Commission Due</div>
+                        <div class="quickPickItem dropdown pay-period" data-operator="pay-period" data-label="Pay Period">
+                            <span class="label">Pay Period:</span>
+                            <select class="payPeriods">
+                                <option value="-1">Select one</option>
+                            </select>
+                        </div>
+                        <div class="quickPickItem dropdown quarter" data-operator="quarter" data-label="Quarter">
+                            <span class="label">Quarter:</span> 
+                            <select class="quarters">
+                                <option value="-1">Select one</option>
+                            </select>
+                        </div>
+                        <div class="quickPickItem dropdown year" data-operator="year" data-label="Year">
+                            <span class="label">Year:</span>
+                            <select class="years">
+                                <option value="-1">Select one</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -52,10 +62,10 @@
             <div id="commissions" class="moduleFrame">
                 <div class="graphFrame offset">
                     <div class="donutAndLegend">
+                        <div class="breadcrumb clearfix">
+                            <span>All Product Types</span>
+                        </div>
                         <div class="donut">
-                            <div class="breadcrumb clearfix">
-                                <span>All Product Types</span>
-                            </div>
                             <div id="donutSVG">
                                 
                             </div>
@@ -95,7 +105,11 @@
                 </div>
                 <div class="gridFrame offset">
                     <div class="gridControls">
-                        
+                        <a class="exportAsCSV" href="#" title="Download CSV"></a>
+                        <div class="csvFileWrapper hidden">
+                            <a class="csvFile" download="commissions-export.csv" target="_blank">commissions-export.csv</a>
+                            <a class="removeCSVFile" href="#">x</a>
+                        </div>
                         <div class="pagination clearfix">
                             <!--<a class="button first" href="#"></a><a class="button previous" href="#"></a><span class="label">Page 1</span><a class="button next" href="#"></a><a class="button last" href="#"></a>-->
                             <a class="button previous" href="#"></a><span class="label">Page 1</span><a class="button next" href="#"></a>
@@ -227,6 +241,6 @@
             </div>
         </script>
 
-        <script data-main="../dist/js/commission_report" src="../js/vendor/require.min.js"></script>
+        <script data-main="../dist/js/commission_report_staging" src="../js/vendor/require.min.js"></script>
     </body>
 </html>
