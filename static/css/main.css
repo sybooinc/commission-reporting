@@ -1022,6 +1022,9 @@ input:focus{
   background: url("../images/exportToExcel.png") center no-repeat;
   background-size: 32px;
 }
+.no-adownload .exportAsCSV{
+  display: none !important;
+}
 .adownload .exportAsCSV{
   display: inline-block;
 }
