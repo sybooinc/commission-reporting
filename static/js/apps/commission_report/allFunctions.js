@@ -694,11 +694,16 @@ define([
 
         var columns = _.keys(syboo.gridVariables.columns),
             columnStr = [],
+            columnNames = [],
             colDelim = '","',
             rowDelim = '"\r\n"';
 
         _.each(columns, function(col){
             columnStr.push("<attribute name='" + col + "' />");
+        });
+
+        _.each(columns, function(col){
+            columnNames.push(syboo.gridVariables.columns[col].name);
         });
 
         var fetchRequest = "<fetch distinct='false' mapping='logical' count='10000'>" +
@@ -722,7 +727,7 @@ define([
             var rowsData = []
                 , results = data.Body.ExecuteResponse.ExecuteResult.Results;
 
-            rowsData.push(columns.join(colDelim));    
+            rowsData.push('"' + columnNames.join(colDelim));    
             if(results.KeyValuePairOfstringanyType.key == 'EntityCollection'){
                 var entities = results.KeyValuePairOfstringanyType.value.Entities;
                 var entityData = _.isArray(entities.Entity) ? entities.Entity : [entities.Entity];
