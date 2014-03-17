@@ -6,10 +6,14 @@ define(['moment'], function(moment){
 	utils.dateSelector = {};
 	utils.dateSelector.payPeriods = [];
     var quarterMap = {
-        '0': 'First',
-        '1': 'Second',
-        '2': 'Third',
-        '3': 'Fourth'
+        '0':  moment().year() + ' - First',
+        '1':  moment().year() + ' - Second',
+        '2':  moment().year() + ' -  Third',
+        '3':  moment().year() + ' - Fourth',
+        '-1': (moment().year() - 1) + ' - Fourth', 
+        '-2': (moment().year() - 1) + ' - Third', 
+        '-3': (moment().year() - 1) + ' - Second', 
+        '-4': (moment().year() - 1) + ' - First', 
     }
 
 	utils.dateSelector.initialize = function(payPeriods){
@@ -26,12 +30,43 @@ define(['moment'], function(moment){
         });
 
 		// show the applicabale quarters quick picks
-		var currentQuarter = Math.floor(moment().month() / 3) + 1;
-        var quarters = [];
-        for(var i = currentQuarter; i > 0; i--){
-            quarters.push(i - 1);
+        var lastYearPayMonths = [];
+        var lastYearQuarters = [];
+        _.each(payPeriods, function(payPeriod) {
+            var payPeriodObj = moment(payPeriod, 'MM/DD/YYYY');
+            var lastYear = moment().year() - 1;
+
+            if(payPeriodObj.year() == lastYear){
+                lastYearPayMonths.push(payPeriodObj.month());
+            }
+        });
+
+        var uLastYearPayMonths = _.uniq(lastYearPayMonths);
+        if(_.contains(uLastYearPayMonths, 11) || _.contains(uLastYearPayMonths, 10) || _.contains(uLastYearPayMonths, 9)){
+            lastYearQuarters.push(-1);
         }
-        _.each(quarters, function(quarter){
+        if(_.contains(uLastYearPayMonths, 8) || _.contains(uLastYearPayMonths, 7) || _.contains(uLastYearPayMonths, 6)){
+            lastYearQuarters.push(-2);
+        }
+        if(_.contains(uLastYearPayMonths, 5) || _.contains(uLastYearPayMonths, 4) || _.contains(uLastYearPayMonths, 3)){
+            lastYearQuarters.push(-3);
+        }
+        if(_.contains(uLastYearPayMonths, 2) || _.contains(uLastYearPayMonths, 1) || _.contains(uLastYearPayMonths, 0)){
+            lastYearQuarters.push(-4);
+        }
+
+		var currentQuarter = Math.floor(moment().month() / 3) + 1;
+        var currentYearQuarters = [];
+        for(var i = currentQuarter; i > 0; i--){
+            currentYearQuarters.push(i - 1);
+        }
+        _.each(currentYearQuarters, function(quarter){
+            $('.quickPickItem .quarters').append($('<option/>', {
+                value: quarter,
+                text: quarterMap[quarter]
+            }));
+        });
+        _.each(lastYearQuarters, function(quarter){
             $('.quickPickItem .quarters').append($('<option/>', {
                 value: quarter,
                 text: quarterMap[quarter]
@@ -56,7 +91,7 @@ define(['moment'], function(moment){
             syboo.utils.dateSelector.onQuickDatePick(e.target);
         });
         $('.quickPickItem.dropdown select').on('change', function(e){
-            if($(e.currentTarget).val() != '-1'){
+            if($(e.currentTarget).val() != ''){
                 syboo.utils.dateSelector.onQuickDatePick($(e.currentTarget).parent('.quickPickItem'));
             }
         });
@@ -120,10 +155,19 @@ define(['moment'], function(moment){
                 break;
             }
             case 'quarter': {
-            	var startMonth = ( ( Number( $('.quickPickItem > select.quarters').val() ) * 3 ) )
-            		, endMonth = startMonth + 3;
-                startDate = moment( { d: 1, M: startMonth} ).format('MM/DD/YYYY');
-                endDate = moment( { d: 0, M: endMonth} ).format('MM/DD/YYYY');
+                var quarterVal = Number( $('.quickPickItem > select.quarters').val() );
+                var startMonth, endMonth, year;
+                if(quarterVal < 0){
+                    startMonth = 12 + (quarterVal * 3);
+                    year = moment().year() - 1;
+                }else{
+                    startMonth = quarterVal * 3;
+                    year = moment().year();
+                }
+            	endMonth = startMonth + 3;
+
+                startDate = moment( { d: 1, M: startMonth, y: year} ).format('MM/DD/YYYY'); 
+                endDate = moment( { d: 0, M: endMonth, y: year} ).format('MM/DD/YYYY');
                 break;
             }
             case 'year': {
